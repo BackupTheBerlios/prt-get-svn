@@ -33,6 +33,7 @@ using namespace std;
 #include "configuration.h"
 
 #include "stringhelper.h"
+#include "versioncomparator.h"
 #include "file.h"
 #include "process.h"
 using namespace StringHelper;
@@ -754,8 +755,8 @@ void PrtGet::printQuickDiff()
         if ( !m_locker.isLocked( it->first ) ) {
             p = m_repo->getPackage( it->first );
             if ( p ) {
-                if ( greaterThan( p->version() + "-" + p->release(),
-                                  it->second, m_parser->keepHigher() ) ) {
+                if (greaterThan(p->version() + "-" + p->release(), 
+                                it->second)) {
                     cout <<  it->first.c_str() << " ";
                 }
             }
@@ -810,7 +811,7 @@ void PrtGet::printDiff()
             }
 
             if ( greaterThan( p->version() + "-" + p->release(),
-                              it->second, m_parser->keepHigher() ) ) {
+                              it->second ) ) {
                 if ( !m_locker.isLocked( it->first )  ||
                      m_parser->otherArgs().size() > 0 ||
                      m_parser->all() ) {
@@ -1032,95 +1033,20 @@ void PrtGet::createCache()
 /*!
   \return true if v1 is greater than v2
  */
-bool PrtGet::greaterThan( const string& v1, 
-                          const string& v2, 
-                          bool parseVersion )
+bool PrtGet::greaterThan( const string& v1, const string& v2 )
 {
+    using namespace VersionComparator;
+    
     if (v1 == v2) {
         return false;
     }
+
     
-    if (parseVersion) {
-
-        string tmp_v1 = getValueBefore( v1, '-' );
-        string tmp_v2 = getValueBefore( v2, '-' );
-        tmp_v1 = getValueBefore( tmp_v1, '_');
-        tmp_v2 = getValueBefore( tmp_v2, '_');
+    if (m_parser->preferHigher() || 
+        (m_config->preferHigher() && !m_parser->strictDiff())) {
         
-        list<string> v1l;
-        split( tmp_v1, '.', v1l );
-        
-        list<string> v2l;
-        split( tmp_v2, '.', v2l );
-        
-        if (v1l.size() > v2l.size()) {
-            while (v1l.size() > v2l.size()) {
-                v2l.push_back("-1");
-            }
-        } else if (v1l.size() < v2l.size()) {
-            while (v1l.size() < v2l.size()) {
-                v1l.push_back("-1");
-            }
-        }
-        
-        // handle 1.2_2 versions; avoid the following case:
-        // 1.2_2 < 1.2.1
-        string subrelease1 = getValue( v1, '_' );
-        subrelease1 = getValueBefore( subrelease1, '-');
-        string subrelease2 = getValue( v2, '_' );
-        subrelease2 = getValueBefore( subrelease2, '-');
-        if (subrelease1 == "") {
-            subrelease1 = "-1";
-        }
-        if (subrelease2 == "") {
-            subrelease2 = "-1";
-        }
-        v1l.push_back( subrelease1 );
-        v2l.push_back( subrelease2 );
-                
-        string tmp_r1 = getValue( v1, '-' );
-        string tmp_r2 = getValue( v2, '-' );
-        v1l.push_back( tmp_r1 );
-        v2l.push_back( tmp_r2 );
-        
-        if ( true || v1l.size() == v2l.size() ) {
-            list<string>::iterator it1 = v1l.begin();
-            list<string>::iterator it2 = v2l.begin();
-            char* error = 0;
-            for ( ; it1 != v1l.end() && it2 != v2l.end(); ++it1, ++it2 ) {
-                error = 0;
-                long iv1 = strtol( (*it1).c_str(), &error, 10 );
-                if ( *error != 0 ) {
-                    break;
-                }
-                error = 0;
-                long iv2 = strtol( it2->c_str(), &error, 10 );
-                if ( *error != 0 ) {
-                    break;
-                }
-#if 0
-                    cout << "DEBUG: " << v1 << " <? " << v2 << " ( " 
-                         << iv1 << " <? " << iv2 << endl;
-#endif
-                if ( iv1 < iv2 ) {
-#if 0
-               cout << "DEBUG: " << v1 << " <? " << v2 << " ( " 
-                    << iv1 << " <? " << iv2 << endl;
-#endif
-                    return false;
-                } else if ( iv1 > iv2 ) {
-                    
-                    
-                    
-                    return true;
-                }
-            }
-
-            if ( error == 0 ) {
-                // same
-                return false;
-            }
-        }
+        COMP_RESULT result = compareVersions(v1, v2);
+        return (result == GREATER);
     }
 
     return v1 != v2;
@@ -1307,7 +1233,7 @@ void PrtGet::sysup()
             p = m_repo->getPackage( it->first );
             if ( p ) {
                 if ( greaterThan( p->version() + "-" + p->release(),
-                                  it->second, m_parser->keepHigher() ) ) {
+                                  it->second ) ) {
                     packagesToUpdate.push_back( it->first );
                 }
             }
@@ -1875,6 +1801,12 @@ void PrtGet::dumpConfig()
     cout.width( 20 );
     cout.fill( ' ' );
     cout << "Run scripts: " <<(m_config->runScripts() ? "yes" : "no" )
+         << endl;
+
+    cout.setf( ios::left, ios::adjustfield );
+    cout.width( 20 );
+    cout.fill( ' ' );
+    cout << "Keep higher version:" <<(m_config->preferHigher() ? "yes" : "no" )
          << endl;
 
     cout.setf( ios::left, ios::adjustfield );

@@ -1,3 +1,20 @@
+0.5.8
+- use configuration file to determine whether to use higher version or
+  not
+- implement --dont-keep-higher -dk, to override configuration setting
+- fix version parsing
+
+
+===============================================================
+
+
+
+
+
+
+
+
+
 next release:
 - configuration override/extend
  [20:01] <cptn> --config-add="prtdir /tmp" even

@@ -89,9 +89,7 @@ public:
 
     void dumpConfig();
 
-    static bool greaterThan( const string& v1, 
-                             const string& v2, 
-                             bool parseVersion );
+    bool greaterThan( const string& v1, const string& v2 );
 
     int returnValue() const;
 

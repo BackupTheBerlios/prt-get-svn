@@ -41,6 +41,7 @@ public:
     std::string cacheFile() const;
 
     bool runScripts() const;
+    bool preferHigher() const;
 
     void addConfig(const std::string& line,
                    bool configSet,
@@ -68,6 +69,7 @@ private:
     ReadmeMode m_readmeMode;
 
     bool m_runScripts;
+    bool m_preferHigher;
 
     std::string m_makeCommand;
     std::string m_addCommand;

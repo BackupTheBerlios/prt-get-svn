@@ -22,8 +22,9 @@ using namespace std;
 namespace StringHelper
 {
 
+template <class T>
 void split( const string& s, char del,
-            list<string>& target,
+            T& target,
             int startPos=0, bool useEmpty=true  );
 
 string stripWhiteSpace( const string& s );
@@ -38,6 +39,41 @@ string toUpperCase( const string& s );
 string replaceAll( string& in,
                    const string& oldString,
                    const string& newString );
+
+
+/*!
+  split a string into parts
+
+  \param s string to be split
+  \param del delimter
+  \param startPos position to start at
+  \param useEmpty include empty (whitespace only9 results in the result
+
+  \return a list of string
+*/
+template <class T>
+void split( const string& s, char del,
+            T& target,
+            int startPos, bool useEmpty )
+{
+    string line = s;
+
+    string::size_type pos;
+    int offset = startPos;
+    while ( ( pos = line.find( del, offset ) ) != string::npos ) {
+        offset = 0;
+
+        string val = line.substr( 0, pos );
+        if ( useEmpty || !stripWhiteSpace( val ).empty() ) {
+            target.push_back( val );
+        }
+        line.erase( 0, pos+1 );
+    }
+
+    if ( line.length() > 0 ) {
+        target.push_back( line );
+    }
+}
 
 
 };

@@ -40,7 +40,8 @@ ArgParser::ArgParser( int argc, char** argv )
       m_all( false ),
       m_execPreInstall( false ),
       m_execPostInstall( false ),
-      m_keepHigher( false )
+      m_preferHigher( false ),
+      m_strictDiff( false )
 {
 }
 
@@ -181,9 +182,11 @@ bool ArgParser::parse()
                 m_execPostInstall = true;
             } else if ( s == "--no-std-config" ) {
                 m_noStdConfig = true;
-            } else if ( s == "--keep-higher" || s == "-kh" ) {
-                m_keepHigher = true;
-                                
+            } else if ( s == "--prefer-higher" || s == "-ph" ) {
+                m_preferHigher = true;
+            } else if ( s == "--strict-diff" || s == "-sd" ) {
+                m_strictDiff = true;
+
             } else if ( s == "-f" ) {
                 m_pkgaddArgs += " " + s;
             } else if ( s == " -fr" ) {
@@ -230,7 +233,7 @@ bool ArgParser::parse()
             } else if ( s.substr( 0, 15 ) == "--install-root=" ) {
                 m_installRoot = s.substr(15);
             } else {
-                m_unknownOption = s;                
+                m_unknownOption = s;
                 return false;
             }
         } else {
@@ -398,7 +401,12 @@ const string& ArgParser::pkgrmArgs() const
     return m_pkgrmArgs;
 }
 
-bool ArgParser::keepHigher() const
+bool ArgParser::preferHigher() const
 {
-    return m_keepHigher;
+    return m_preferHigher;
+}
+
+bool ArgParser::strictDiff() const
+{
+    return m_strictDiff;
 }

@@ -66,6 +66,7 @@ public:
     void sysup();
     void current();
     void printDepends( bool simpleListing=false );
+    void printDependTree();
     void printDependendent();
     void printDiff();
     void printQuickDiff();
@@ -93,6 +94,8 @@ public:
     SignalHandler::HandlerResult handleSignal( int signal );
 
 protected:
+    
+    void printDepsLevel(int indent, const Package* package);
 
     void executeTransaction( InstallTransaction& transaction,
                              bool update, bool group );

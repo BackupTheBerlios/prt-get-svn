@@ -110,7 +110,7 @@ const string& ArgParser::alternateConfigFile() const
 */
 bool ArgParser::parse()
 {
-    const int commandCount = 32;
+    const int commandCount = 33;
     string commands[commandCount] = { "list", "search", "dsearch",
                                       "info",
                                       "depends", "install", "depinst",
@@ -121,7 +121,7 @@ bool ArgParser::parse()
                                       "dependent", "sysup", "current",
                                       "fsearch", "lock", "unlock",
                                       "listlocked", "cat", "ls", "edit",
-                                      "remove" };
+                                      "remove", "deptree" };
 
     Type commandID[commandCount] = { LIST, SEARCH, DSEARCH, INFO,
                                      DEPENDS, INSTALL, DEPINST,
@@ -131,11 +131,11 @@ bool ArgParser::parse()
                                      PATH, LISTINST, PRINTF, README,
                                      DEPENDENT, SYSUP, CURRENT,
                                      FSEARCH, LOCK, UNLOCK, LISTLOCKED,
-                                     CAT, LS, EDIT, REMOVE };
+                                     CAT, LS, EDIT, REMOVE, DEPTREE };
     if ( m_argc < 2 ) {
         return false;
     }
-    
+
     // if called from a symlink ending on prt-cache, use cached
     // access
     string app = m_argv[0];

@@ -18,6 +18,7 @@
 #include <set>
 #include <iomanip>
 #include <cstdio>
+#include <cassert>
 using namespace std;
 
 #include <sys/types.h>
@@ -411,7 +412,7 @@ void PrtGet::initRepo( bool listDuplicate )
 
             fclose(depFP);
         } else {
-            cerr << "Warning: Failed to open dependency file " 
+            cerr << "Warning: Failed to open dependency file "
                  << depFile << endl;
         }
     }
@@ -1640,4 +1641,58 @@ void PrtGet::argCountFailure(int count, const string& specifier)
          << m_parser->commandName() << " takes " << specifier << " "
          << count << (count > 1 ? " arguments" : " argument") << endl;
     exit(PG_ARG_ERROR);
+}
+
+
+void PrtGet::printDependTree()
+{
+    assertExactArgCount(1);
+
+    initRepo();
+
+    list<char*>::const_iterator it = m_parser->otherArgs().begin();
+    string arg = *it;
+    const Package* p = m_repo->getPackage( arg );
+    if (!p) {
+        cerr << "Package " << arg << " not found" << endl;
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
+    }
+    
+    if (p->dependencies().length() > 0) {
+        cout << "-- dependencies ([i] = installed)" << endl;
+        if ( m_pkgDB.isInstalled( *it ) ) {
+            cout << "[i] ";
+        } else {
+            cout << "[ ] ";
+        }
+        cout << p->name() << endl;
+        printDepsLevel(2, p);
+    }
+    
+}
+
+void PrtGet::printDepsLevel(int indent, const Package* package)
+{
+    list<string> deps;
+    StringHelper::split(package->dependencies(), ',', deps);
+    list<string>::iterator it = deps.begin();
+    for (; it != deps.end(); ++it) {        
+        if ( m_pkgDB.isInstalled( *it ) ) {
+            cout << "[i] ";
+        } else {
+            cout << "[ ] ";
+        }
+        for (int i = 0; i < indent; ++i) {
+            cout << " ";
+        }
+        cout << *it;
+        const Package* p = m_repo->getPackage( *it );
+        if (p) {
+            cout << endl;
+            printDepsLevel(indent+2, p);
+        } else {
+            cout << " (not found in ports tree)" << endl;
+        }
+    }
 }

@@ -36,7 +36,8 @@ public:
                 QUICKDIFF, SHOW_VERSION, CREATE_CACHE, PATH,
                 LISTINST, PRINTF, README, DEPENDENT, SYSUP,
                 CURRENT, FSEARCH, LOCK, UNLOCK, LISTLOCKED,
-                CAT, LS, EDIT, REMOVE };
+                CAT, LS, EDIT, REMOVE,
+                DEPTREE };
 
     bool isCommandGiven() const;
     bool isForced() const;
@@ -57,7 +58,7 @@ public:
     const string& sortArgs() const;
     const string& filter() const;
 
-    
+
 
     Type commandType() const;
 

@@ -13,7 +13,7 @@
   - install transaction
   - etc.
   - Transaction handler
-
+- better examples for man page
 
 0.5.x:
 
@@ -36,8 +36,6 @@
 
 SHORT TERM
 ------------
-
-* XML manual: add chapter about programmable bash completion
 
 * Answer FAQs
 

@@ -16,7 +16,7 @@
 #include <utility>
 #include <list>
 #include <string>
-using namespace std;
+
 
 /*!
   \class PkgDB
@@ -27,21 +27,30 @@ using namespace std;
 class PkgDB
 {
 public:
-    PkgDB( const string& installRoot = "" );
-    bool isInstalled( const string& name ) const;
-    string getPackageVersion( const string& name ) const;
-    const map<string, string>& installedPackages();
-    void getMatchingPackages( const string& pattern,
-                              map<string,string>& target ) const;
+    PkgDB( const std::string& installRoot = "" );
+    bool isInstalled( const std::string& name, 
+                      bool useAlias = false,
+                      bool* isAlias = 0,
+                      string* aliasOrignalName = 0 ) const;
+    
+    
+    std::string getPackageVersion( const std::string& name ) const;
+    const std::map<std::string, std::string>& installedPackages();
+    void getMatchingPackages( const std::string& pattern,
+                              map<std::string,std::string>& target ) const;
 private:
     bool load() const;
+    
+    bool aliasExistsFor(const string& name, string& provider) const;
 
     mutable bool m_isLoaded;
-    mutable map<string, string> m_packages;
-    
-    string m_installRoot;
+    mutable std::map<std::string, std::string> m_packages;
+    mutable std::map<std::string, std::string> m_aliases;
 
-    static const string PKGDB;
+    std::string m_installRoot;
+
+    static const std::string PKGDB;
+    static const std::string ALIAS_STORE;
 };
 
 #endif /* _PKGDB_H_ */

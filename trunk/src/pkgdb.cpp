@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <map>
 using namespace std;
 
 #include <cstring>
@@ -19,9 +20,11 @@ using namespace std;
 #include <fnmatch.h>
 
 #include "pkgdb.h"
+#include "datafileparser.h"
 
 
 const string PkgDB::PKGDB = "/var/lib/pkg/db";
+const string PkgDB::ALIAS_STORE = "/var/lib/pkg/aliases";
 
 /*!
   Create a PkgDB object
@@ -36,18 +39,50 @@ PkgDB::PkgDB( const string& installRoot )
   Check whether a package is installed
 
   \param name the name of the package to check
+  \param isAlias whether a package is installed as alias
+  \param aliasOriginalName the original name of an aliased package
+  
   \return whether package \a name is installed
 */
-bool PkgDB::isInstalled( const string& name ) const
+bool PkgDB::isInstalled( const string& name, 
+                         bool useAlias,
+                         bool* isAlias,
+                         string* aliasOrignalName ) const
 {
     if ( !load() ) {
         return false;
     }
 
-    return m_packages.find( name ) != m_packages.end();
+    bool installed = m_packages.find( name ) != m_packages.end();
+    if (!installed) {
+        string provider;
+        installed = aliasExistsFor(name, provider);
+
+        if (isAlias) {
+            *isAlias = installed;
+            
+            if (installed && aliasOrignalName) {
+                *aliasOrignalName = provider;
+            }
+        }
+    }
+
+    return installed;
 }
 
 
+bool PkgDB::aliasExistsFor(const string& name, string& providerName) const
+{
+    map<string, string>::iterator it = m_aliases.begin();
+    for (; it != m_aliases.end(); ++it) {
+        if (it->second.find(name) != string::npos) {
+            providerName = it->first;
+            return true;
+        }
+    }
+    
+    return false;
+}
 
 /*!
   load the package db
@@ -57,10 +92,10 @@ bool PkgDB::load() const
     if ( m_isLoaded ) {
         return true;
     }
-    m_isLoaded = true;
 
 #if 0
     // check this one out to see a really slow IO library :-(
+
 
     ifstream db( PKGDB );
     string line;
@@ -80,6 +115,9 @@ bool PkgDB::load() const
     db.close();
 #endif
 
+    std::map<std::string, std::string> aliases;
+    DataFileParser::parse(ALIAS_STORE, aliases);
+        
     const int length = 256;
     char line[length];
     bool emptyLine = true;
@@ -91,7 +129,7 @@ bool PkgDB::load() const
         pkgdb = m_installRoot;
     }
     pkgdb += PKGDB;
-    
+
     FILE* fp = fopen( pkgdb.c_str(), "r" );
     if ( fp ) {
         while ( fgets( line, length, fp ) ) {
@@ -103,8 +141,10 @@ bool PkgDB::load() const
             } else if ( nameRead ) {
                 line[strlen(line)-1] = '\0';
                 m_packages[ name ] = line;
-                nameRead = false;
-
+                nameRead = false;                 
+                if (aliases.find(name) != aliases.end()) {
+                    m_aliases[name] = aliases[name];
+                }
             }
             if ( line[0] == '\n' ) {
                 emptyLine = true;
@@ -114,7 +154,12 @@ bool PkgDB::load() const
     } else {
         return false;
     }
+    
+    m_isLoaded = true;
+
     fclose( fp );
+
+    return true;
 }
 
 /*!

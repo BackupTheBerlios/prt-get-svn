@@ -114,7 +114,8 @@ InstallTransaction::install( const ArgParser* parser,
             continue;
         }
 
-        if ( !update && m_pkgDB->isInstalled( package->name() ) ) {
+        // consider aliases here, but don't show them specifically
+        if ( !update && m_pkgDB->isInstalled( package->name(), true ) ) {
             // ignore
             m_alreadyInstalledPackages.push_back( package->name() );
             continue;
@@ -211,7 +212,7 @@ InstallTransaction::installPackage( const Package* package,
 
     string pkgdir = package->path() + "/" + package->name();
     chdir( pkgdir.c_str() );
-    
+
     string runscriptCommand = "sh";
     if (m_config->runscriptCommand() != "") {
         runscriptCommand = m_config->runscriptCommand();
@@ -221,8 +222,8 @@ InstallTransaction::installPackage( const Package* package,
     struct stat statData;
     if ((parser->execPreInstall() || m_config->runScripts()) &&
         stat((pkgdir + "/" + "pre-install").c_str(), &statData) == 0) {
-        Process preProc( runscriptCommand, 
-                         pkgdir + "/" + "pre-install", 
+        Process preProc( runscriptCommand,
+                         pkgdir + "/" + "pre-install",
                          fdlog );
         if (preProc.executeShell()) {
             info.preState = FAILED;

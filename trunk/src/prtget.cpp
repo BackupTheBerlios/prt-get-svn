@@ -369,7 +369,7 @@ void PrtGet::printInfo()
             StringHelper::replaceAll( filesString, " ", "," );
             cout << "Files:        " << filesString << endl;
         }
-        
+
         if ( m_parser->verbose() > 0 && p->hasReadme()) {
             cout << "\n-- README ------" << endl;
             readme();
@@ -439,7 +439,7 @@ void PrtGet::initRepo( bool listDuplicate )
     }
 
     std::string depFile = m_config->depFile();
-    if (depFile != "") {        
+    if (depFile != "") {
         map<string, string> depMap;
         if (DataFileParser::parse(depFile, depMap)) {
             m_repo->addDependencies(depMap);
@@ -458,8 +458,17 @@ void PrtGet::isInstalled()
     const list<char*>& l = m_parser->otherArgs();
     list<char*>::const_iterator it = l.begin();
     for ( ; it != l.end(); ++it ) {
-        if ( m_pkgDB->isInstalled( *it ) ) {
-            cout << "package " << *it << " is installed" << endl;
+        bool isAlias = false;
+        string aliasName;
+        
+        if ( m_pkgDB->isInstalled( *it, true, &isAlias, &aliasName  ) ) {
+            if (isAlias) {
+                cout << *it << " is provided by package " 
+                     << aliasName
+                     << endl;
+            } else {
+                cout << "package " << *it << " is installed" << endl;
+            }
         } else {
             cout << "package " << *it << " is not installed" << endl;
             m_returnValue = PG_GENERAL_ERROR;
@@ -685,13 +694,21 @@ void PrtGet::printDepends( bool simpleListing )
         if ( deps.size() > 0 ) {
             cout << "-- dependencies ([i] = installed)" << endl;
             list<string>::const_iterator it = deps.begin();
+            
+            bool isAlias;
+            string provider;
             for ( ; it != deps.end(); ++it ) {
-                if ( m_pkgDB->isInstalled( *it ) ) {
+                isAlias = false;
+                if ( m_pkgDB->isInstalled( *it, true, &isAlias, &provider ) ) {
                     cout << "[i] ";
                 } else {
                     cout << "[ ] ";
                 }
-                cout << *it << endl;
+                cout << *it;
+                if (isAlias) {
+                    cout << " (provided by " << provider << ")";
+                }
+                cout << endl;
             }
         } else {
             cout << "No dependencies found" << endl;

@@ -58,12 +58,30 @@ public:
         NO_LOG_FILE,         /*!< no log file specified */
         CANT_LOCK_LOG_FILE   /*!< can't create lock for log file */
     };
+    
+    enum State {
+        EXECUTED,
+        FAILED,
+        NONEXISTENT
+    };
+    struct ScriptState {
+        ScriptState(bool hasReadme_) {
+            hasReadme = hasReadme_;
+            preState = NONEXISTENT;
+            postState = NONEXISTENT;
+        }
+        State preState;
+        State postState;
+        bool hasReadme;
+    };
+    
     InstallResult install( const ArgParser* parser,
                            bool update,
                            bool group );
     InstallResult  calcDependencies();
 
-    const list< pair<string, bool> >& installedPackages() const;
+    const list< pair<string, ScriptState> >& installedPackages() const;
+    const map<string, ScriptState>& scriptStates() const;
     const list<string>& alreadyInstalledPackages() const;
 
 
@@ -80,7 +98,7 @@ private:
                                   bool update ) const;
 
     static string getPkgDest();
-    
+
     PkgDB& m_pkgDB;
     DepResolver m_resolver;
     const Repository* m_repo;
@@ -92,7 +110,7 @@ private:
     bool m_depCalced;
 
     // packages< pair<name, hasReadme> > installed by this transaction
-    list< pair<string, bool> > m_installedPackages;
+    list< pair<string, ScriptState> > m_installedPackages;
 
     // packages which were requested to be installed which where already
     list<string> m_alreadyInstalledPackages;

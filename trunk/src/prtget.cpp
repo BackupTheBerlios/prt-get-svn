@@ -795,16 +795,20 @@ void PrtGet::printResult( InstallTransaction& transaction,
             cout << *ait << endl;
         }
     }
-    const list< pair<string, bool> >& inst = transaction.installedPackages();
+    
+    
+    const list< pair<string, InstallTransaction::ScriptState> >& inst = 
+        transaction.installedPackages();
     if ( inst.size() ) {
         cout << endl << "-- Packages " << command[1] << endl;
-        list< pair<string, bool> >::const_iterator iit = inst.begin();
+        list< pair<string, InstallTransaction::ScriptState> >::const_iterator 
+            iit = inst.begin();
 
         bool atLeastOnePackageHasReadme = false;
 
         for ( ; iit != inst.end(); ++iit ) {
             cout << iit->first;
-            if ( iit->second ) {
+            if ( iit->second.hasReadme ) {
                 if ( m_config->readmeMode() ==
                      Configuration::COMPACT_README ) {
                     cout << " (README)";
@@ -821,7 +825,7 @@ void PrtGet::printResult( InstallTransaction& transaction,
                      << " packages with README files:" << endl;
                 iit = inst.begin();
                 for ( ; iit != inst.end(); ++iit ) {
-                    if ( iit->second ) {
+                    if ( iit->second.hasReadme ) {
                         cout << iit->first;
                         cout << endl;
                     }
@@ -1452,12 +1456,12 @@ void PrtGet::remove()
     list<string> removed;
     list<string> failed;
     list<string> notInstalled;
-    
+
     const list<char*>& args = m_parser->otherArgs();
     list<char*>::const_iterator it = args.begin();
     for ( ; it != args.end(); ++it ) {
         if (m_pkgDB.isInstalled(*it)) {
-            Process proc("pkgrm", *it); 
+            Process proc("pkgrm", *it);
             if (proc.executeShell() == 0) {
                 removed.push_back(*it);
             } else {
@@ -1467,7 +1471,7 @@ void PrtGet::remove()
             notInstalled.push_back(*it);
         }
     }
-    
+
     if ( removed.size() ) {
         cout << endl << "-- Packages removed"
              << endl;
@@ -1497,6 +1501,6 @@ void PrtGet::remove()
             cout << *it << endl;
         }
     }
-    
-    
+
+
 }

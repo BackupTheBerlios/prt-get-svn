@@ -122,8 +122,9 @@ InstallTransaction::install( const ArgParser* parser,
         InstallTransaction::InstallResult result;
         if ( parser->isTest() ||
              (result = installPackage( package, parser ,update )) == SUCCESS) {
-            m_installedPackages.push_back( make_pair( package->name(),
-                                                      package->hasReadme () ));
+            
+            ScriptState state( package->hasReadme() );
+            m_installedPackages.push_back( make_pair( package->name(), state));
         } else {
 
             // log failures are critical
@@ -412,7 +413,8 @@ const list<string>& InstallTransaction::alreadyInstalledPackages() const
 /*!
   \return the packages which were installed in this transaction
 */
-const list< pair<string, bool> >& InstallTransaction::installedPackages() const
+const list< pair<string, InstallTransaction::ScriptState> >& 
+InstallTransaction::installedPackages() const
 {
     return m_installedPackages;
 }

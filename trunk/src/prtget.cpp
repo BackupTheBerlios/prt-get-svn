@@ -378,7 +378,7 @@ void PrtGet::printInfo()
         }
 
     } else {
-        cerr << "Package " << arg << " not found" << endl;
+        cerr << "Package '" << arg << "' not found" << endl;
         m_returnValue = PG_GENERAL_ERROR;
         return;
     }
@@ -894,7 +894,7 @@ void PrtGet::printPath()
     if ( p ) {
         cout << p->path() << "/" << p->name() << endl;
     } else {
-        cerr << "Package " << arg << " not found" << endl;
+        cerr << "Package '" << arg << "' not found" << endl;
         m_returnValue = PG_GENERAL_ERROR;
         return;
     }
@@ -1200,7 +1200,7 @@ void PrtGet::readme()
         }
 
     } else {
-        cerr << "Package " << arg << " not found" << endl;
+        cerr << "Package '" << arg << "' not found" << endl;
         m_returnValue = PG_GENERAL_ERROR;
         return;
     }
@@ -1449,7 +1449,7 @@ void PrtGet::setLock( bool lock )
                     m_returnValue = PG_GENERAL_ERROR;
                 }
             } else {
-                cerr << "Package not found: " << *it << endl;
+                cerr << "Package '" << *it << "' not found" << endl;
                 m_returnValue = PG_GENERAL_ERROR;
             }
 
@@ -1525,7 +1525,7 @@ void PrtGet::edit()
                 cerr << "error while execution the editor" << endl;
             }
         } else {
-            cerr << "Package " << arg << " not found" << endl;
+            cerr << "Package '" << arg << "' not found" << endl;
             m_returnValue = PG_GENERAL_ERROR;
             return;
         }
@@ -1566,7 +1566,7 @@ void PrtGet::ls()
             cout << *fit << endl;
         }
     } else {
-        cerr << "Package " << arg << " not found" << endl;
+        cerr << "Package '" << arg << "' not found" << endl;
         m_returnValue = PG_GENERAL_ERROR;
         return;
     }
@@ -1591,13 +1591,13 @@ void PrtGet::cat()
             }
             fclose( fp );
         } else {
-            cerr << "File " << *it << " not found" << endl;
+            cerr << "File '" << *it << "' not found" << endl;
             m_returnValue = PG_GENERAL_ERROR;
             return;
         }
 
     } else {
-        cerr << "Package " << arg << " not found" << endl;
+        cerr << "Package '" << arg << "' not found" << endl;
         m_returnValue = PG_GENERAL_ERROR;
         return;
     }
@@ -1722,7 +1722,7 @@ void PrtGet::printDependTree()
     string arg = *it;
     const Package* p = m_repo->getPackage( arg );
     if (!p) {
-        cerr << "Package " << arg << " not found" << endl;
+        cerr << "Package '" << arg << "' not found" << endl;
         m_returnValue = PG_GENERAL_ERROR;
         return;
     }

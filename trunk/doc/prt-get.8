@@ -85,6 +85,10 @@ depends on package1
 install all packages listed in this order
 
 .TP 
+.B remove <package1> [<package2> ...]
+remove packages listed in this order
+
+.TP 
 .B sysup [\-\-nodeps]
 Update all installed packages which are outdated. Sorts by dependencies
 if specified. If you don't want prt-get to resolve the dependencies, use
@@ -330,7 +334,19 @@ Use cache file for this command
 .TP 
 .B \-\-test
 Dry run, don't actually install anything, mostly interesting for
-.B prt\-get install, prt\-get grpinst, prt\-get update
+.B prt\-get install, prt\-get grpinst, prt\-get update, prt\-get sysup
+
+.TP 
+.B \-\-pre-install
+Execute pre-install script if it's there
+
+.TP 
+.B \-\-post-install
+Execute post-install script if it's there
+
+.TP 
+.B \-\-install-scripts
+Execute pre-install and post-install script if they're there
 
 
 .TP 

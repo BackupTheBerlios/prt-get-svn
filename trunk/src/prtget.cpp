@@ -1603,7 +1603,7 @@ void PrtGet::assertMinArgCount(int count)
 {
      if ( m_parser->otherArgs().size() < count ) {
         cerr << m_appName << " "
-             << m_parser->commandName() << "takes at least "
+             << m_parser->commandName() << " takes at least "
              << count << (count > 1 ? " arguments" : " argument") << endl;
         exit(PG_ARG_ERROR);
      }

@@ -82,11 +82,17 @@ if set to yes, execute pre- and post-install scripts
 
 .LP
 .B makecommand
-and
 .B addcommand
-can be used to use an alternate command instead of 'pkgmk' (for the
-makecommand) and 'pkgadd' (for the addcommand). These are expert
-options which shouldn't be used in general.
+.B removecommand
+.B runscriptcommand
+can be used to use an alternate command instead of 'pkgmk' for the
+makecommand,'pkgadd' for the addcommand, 'pkgrm' for the
+removecommand and 'sh' for the command which is used to run the pre- and
+post-install scripts. These are expert options which shouldn't be used
+in general; when used the wrong way, they can completely break prt-get's
+original functionality.
+
+
 
 .LP
 The log options are

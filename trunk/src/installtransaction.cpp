@@ -82,7 +82,7 @@ InstallTransaction::InstallTransaction( const list<string>& names,
 /*!
   \return packages where building/installation failed
 */
-const list< pair<string, InstallTransaction::InstallInfo> >& 
+const list< pair<string, InstallTransaction::InstallInfo> >&
 InstallTransaction::installError() const
 {
     return m_installErrors;
@@ -124,7 +124,7 @@ InstallTransaction::install( const ArgParser* parser,
         InstallInfo info( package->hasReadme() );
         if ( parser->isTest() ||
              (result = installPackage( package, parser, update, info )) == SUCCESS) {
-            
+
             m_installedPackages.push_back( make_pair( package->name(), info));
         } else {
 
@@ -161,7 +161,7 @@ InstallTransaction::InstallResult
 InstallTransaction::installPackage( const Package* package,
                                     const ArgParser* parser,
                                     bool update,
-                                    InstallTransaction::InstallInfo& info ) 
+                                    InstallTransaction::InstallInfo& info )
     const
 {
 
@@ -226,12 +226,12 @@ InstallTransaction::installPackage( const Package* package,
         stat((pkgdir + "/" + "pre-install").c_str(), &statData) == 0) {
         Process preProc( "sh", pkgdir + "/" + "pre-install" );
         if (preProc.executeShell()) {
-            info.preState = FAILED;   
+            info.preState = FAILED;
         } else {
             info.preState = EXEC_SUCCESS;
         }
     }
-    
+
     // -- build
     string cmd = "pkgmk";
     string args = "-d " + parser->pkgmkArgs();
@@ -242,6 +242,7 @@ InstallTransaction::installPackage( const Package* package,
         // -- update
         string pkgdest = getPkgDest();
         if ( pkgdest != "" ) {
+            // TODO: don't manipulate pkgdir
             pkgdir = pkgdest;
             cout << "Using PKGMK_PACKAGE_DIR: " << pkgdir << endl;
         }
@@ -276,11 +277,15 @@ InstallTransaction::installPackage( const Package* package,
             } else {
                 // exec post install
                 if (parser->execPostInstall() &&
-                    stat((pkgdir + "/" + "post-install").c_str(), &statData) 
+                    stat((package->path() + "/" + package->name() + 
+                          "/" + "post-install").c_str(), &statData)
                     == 0) {
-                    Process postProc( "sh", pkgdir + "/" + "post-install" );
+                    // Work around the pkgdir variable change
+                    Process postProc( "sh", 
+                                      package->path() + "/" + package->name()+
+                                      "/" + "post-install" );
                     if (postProc.executeShell()) {
-                        info.postState = FAILED;   
+                        info.postState = FAILED;
                     } else {
                         info.postState = EXEC_SUCCESS;
                     }
@@ -441,7 +446,7 @@ const list<string>& InstallTransaction::alreadyInstalledPackages() const
 /*!
   \return the packages which were installed in this transaction
 */
-const list< pair<string, InstallTransaction::InstallInfo> >& 
+const list< pair<string, InstallTransaction::InstallInfo> >&
 InstallTransaction::installedPackages() const
 {
     return m_installedPackages;

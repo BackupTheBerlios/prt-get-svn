@@ -45,9 +45,11 @@ public:
     void addConfig(const std::string& line,
                    bool configSet,
                    bool configPrepend);
-    
+
     std::string makeCommand() const;
     std::string addCommand() const;
+    std::string removeCommand() const;
+    std::string runscriptCommand() const;
 
 private:
     std::string m_configFile;
@@ -66,9 +68,11 @@ private:
     ReadmeMode m_readmeMode;
 
     bool m_runScripts;
-    
+
     std::string m_makeCommand;
     std::string m_addCommand;
+    std::string m_removeCommand;
+    std::string m_runscriptCommand;
 
 
     void parseLine(const std::string& line, bool prepend=false);

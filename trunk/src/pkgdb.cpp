@@ -26,8 +26,9 @@ const string PkgDB::PKGDB = "/var/lib/pkg/db";
 /*!
   Create a PkgDB object
 */
-PkgDB::PkgDB()
-    : m_isLoaded( false )
+PkgDB::PkgDB( const string& installRoot )
+    : m_isLoaded( false ),
+      m_installRoot( installRoot )
 {
 }
 
@@ -85,7 +86,13 @@ bool PkgDB::load() const
     bool nameRead = false;
     string name;
 
-    FILE* fp = fopen( PKGDB.c_str(), "r" );
+    string pkgdb = "";
+    if (m_installRoot != "") {
+        pkgdb = m_installRoot;
+    }
+    pkgdb += PKGDB;
+    
+    FILE* fp = fopen( pkgdb.c_str(), "r" );
     if ( fp ) {
         while ( fgets( line, length, fp ) ) {
             if ( emptyLine ) {

@@ -43,7 +43,7 @@ using namespace StringHelper;
 */
 InstallTransaction::InstallTransaction( const list<char*>& names,
                                         const Repository* repo,
-                                        PkgDB& pkgDB,
+                                        PkgDB* pkgDB,
                                         const Configuration* config )
     : m_repo( repo ),
       m_pkgDB( pkgDB ),
@@ -65,7 +65,7 @@ InstallTransaction::InstallTransaction( const list<char*>& names,
 */
 InstallTransaction::InstallTransaction( const list<string>& names,
                                         const Repository* repo,
-                                        PkgDB& pkgDB,
+                                        PkgDB* pkgDB,
                                         const Configuration* config )
     : m_repo( repo ),
       m_pkgDB( pkgDB ),
@@ -114,7 +114,7 @@ InstallTransaction::install( const ArgParser* parser,
             continue;
         }
 
-        if ( !update && m_pkgDB.isInstalled( package->name() ) ) {
+        if ( !update && m_pkgDB->isInstalled( package->name() ) ) {
             // ignore
             m_alreadyInstalledPackages.push_back( package->name() );
             continue;
@@ -211,12 +211,19 @@ InstallTransaction::installPackage( const Package* package,
 
     string pkgdir = package->path() + "/" + package->name();
     chdir( pkgdir.c_str() );
+    
+    string runscriptCommand = "sh";
+    if (m_config->runscriptCommand() != "") {
+        runscriptCommand = m_config->runscriptCommand();
+    }
 
     // -- pre-install
     struct stat statData;
     if ((parser->execPreInstall() || m_config->runScripts()) &&
         stat((pkgdir + "/" + "pre-install").c_str(), &statData) == 0) {
-        Process preProc( "sh", pkgdir + "/" + "pre-install", fdlog );
+        Process preProc( runscriptCommand, 
+                         pkgdir + "/" + "pre-install", 
+                         fdlog );
         if (preProc.executeShell()) {
             info.preState = FAILED;
         } else {
@@ -229,7 +236,7 @@ InstallTransaction::installPackage( const Package* package,
     if (m_config->makeCommand() != "") {
         cmd = m_config->makeCommand();
     }
-    
+
     string args = "-d " + parser->pkgmkArgs();
     Process makeProc( cmd, args, fdlog );
     if ( makeProc.executeShell() ) {
@@ -258,6 +265,11 @@ InstallTransaction::installPackage( const Package* package,
             }
 
             args = "";
+            if (parser->installRoot() != "") {
+                args = "-r " + parser->installRoot() + " ";
+            }
+
+
             if ( update ) {
                 args += "-u ";
             }
@@ -291,7 +303,7 @@ InstallTransaction::installPackage( const Package* package,
                           "/" + "post-install").c_str(), &statData)
                     == 0) {
                     // Work around the pkgdir variable change
-                    Process postProc( "sh",
+                    Process postProc( runscriptCommand,
                                       package->path() + "/" + package->name()+
                                       "/" + "post-install",
 				      fdlog );

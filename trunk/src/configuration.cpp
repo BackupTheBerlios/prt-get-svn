@@ -31,7 +31,8 @@ Configuration::Configuration( const std::string& configFile,
       m_cacheFile( "" ),
       m_readmeMode( VERBOSE_README ),
       m_runScripts( false ),
-      m_makeCommand( "" ), m_addCommand( "" )
+      m_makeCommand( "" ), m_addCommand( "" ), 
+      m_removeCommand( "" ), m_runscriptCommand( "" )
 {
 
 }
@@ -177,6 +178,10 @@ void Configuration::parseLine(const string& line, bool prepend)
         m_makeCommand = stripWhiteSpace( s.replace( 0, 11, "" ) );
     } else if ( startwith_nocase( s, "addcommand" ) ) {
         m_addCommand = stripWhiteSpace( s.replace( 0, 10, "" ) );
+    } else if ( startwith_nocase( s, "removecommand" ) ) {
+        m_removeCommand = stripWhiteSpace( s.replace( 0, 13, "" ) );
+    } else if ( startwith_nocase( s, "runscriptcommand" ) ) {
+        m_runscriptCommand = stripWhiteSpace( s.replace( 0, 16, "" ) );
     }
 }
 
@@ -193,4 +198,14 @@ std::string Configuration::makeCommand() const
 std::string Configuration::addCommand() const
 {
     return m_addCommand;
+}
+
+std::string Configuration::removeCommand() const
+{
+    return m_removeCommand;
+}
+
+std::string Configuration::runscriptCommand() const
+{
+    return m_runscriptCommand;
 }

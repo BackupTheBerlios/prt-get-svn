@@ -56,9 +56,10 @@ public:
     const string& alternateConfigFile() const;
     const string& pkgmkArgs() const;
     const string& pkgaddArgs() const;
+    const string& pkgrmArgs() const;
     const string& sortArgs() const;
     const string& filter() const;
-
+    const string& installRoot() const;
 
 
     Type commandType() const;
@@ -98,10 +99,12 @@ private:
     string m_alternateConfigFile;
     string m_pkgmkArgs;
     string m_pkgaddArgs;
+    string m_pkgrmArgs;
     string m_sortArgs;
     string m_filter;
     string m_commandName;
     string m_unknownOption;
+    string m_installRoot;
 
     Type m_commandType;
 

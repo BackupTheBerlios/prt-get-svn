@@ -27,7 +27,7 @@ using namespace std;
 class PkgDB
 {
 public:
-    PkgDB();
+    PkgDB( const string& installRoot = "" );
     bool isInstalled( const string& name ) const;
     string getPackageVersion( const string& name ) const;
     const map<string, string>& installedPackages();
@@ -38,6 +38,8 @@ private:
 
     mutable bool m_isLoaded;
     mutable map<string, string> m_packages;
+    
+    string m_installRoot;
 
     static const string PKGDB;
 };

@@ -28,6 +28,9 @@ ArgParser::ArgParser( int argc, char** argv )
       m_calledAsPrtCache( false ),
       m_alternateConfigFile( "" ),
       m_pkgmkArgs( "" ),
+      m_pkgaddArgs( "" ),
+      m_pkgrmArgs( "" ),
+      m_installRoot( "" ),
       m_argc( argc ),
       m_argv( argv ),
       m_verbose( 0 ),
@@ -198,6 +201,8 @@ bool ArgParser::parse()
                 m_pkgmkArgs = s.substr( 8 );
             } else if ( s.substr( 0, 8 ) == "--aargs=" ) {
                 m_pkgaddArgs = s.substr( 8 );
+            } else if ( s.substr( 0, 8 ) == "--rargs=" ) {
+                m_pkgrmArgs = s.substr( 8 );
             } else if ( s.substr( 0, 7 ) == "--sort=" ) {
                 m_sortArgs = s.substr( 7 );
             } else if ( s.substr( 0, 9 ) == "--filter=" ) {
@@ -214,6 +219,8 @@ bool ArgParser::parse()
                                                  CONFIG_PREPEND ) );
             } else if ( s.substr( 0, 13 ) == "--config-set=" ) {
                 m_configData.push_back(make_pair(m_argv[i]+13, CONFIG_SET ) );
+            } else if ( s.substr( 0, 15 ) == "--install-root=" ) {
+                m_installRoot = s.substr(15);
             } else {
                 m_unknownOption = s;
                 return false;
@@ -354,4 +361,14 @@ const list< pair<char*, ArgParser::ConfigArgType> >
 ArgParser::configData() const
 {
     return m_configData;
+}
+
+const string& ArgParser::installRoot() const
+{
+    return m_installRoot;
+}
+
+const string& ArgParser::pkgrmArgs() const
+{
+    return m_pkgrmArgs;
 }

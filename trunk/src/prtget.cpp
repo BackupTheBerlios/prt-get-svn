@@ -59,6 +59,8 @@ PrtGet::PrtGet( const ArgParser* parser )
         m_appName = "prt-get";
     }
 
+
+    m_pkgDB = new PkgDB( m_parser->installRoot() );
 }
 
 /*! destruct PrtGet object */
@@ -70,6 +72,8 @@ PrtGet::~PrtGet()
     if ( m_repo ) {
         delete m_repo;
     }
+
+    delete m_pkgDB;
 }
 
 
@@ -444,7 +448,7 @@ void PrtGet::isInstalled()
     const list<char*>& l = m_parser->otherArgs();
     list<char*>::const_iterator it = l.begin();
     for ( ; it != l.end(); ++it ) {
-        if ( m_pkgDB.isInstalled( *it ) ) {
+        if ( m_pkgDB->isInstalled( *it ) ) {
             cout << "package " << *it << " is installed" << endl;
         } else {
             cout << "package " << *it << " is not installed" << endl;
@@ -466,7 +470,7 @@ void PrtGet::listInstalled()
     }
 
     map<string, string> l;
-    m_pkgDB.getMatchingPackages( arg, l );
+    m_pkgDB->getMatchingPackages( arg, l );
     map<string, string>::iterator it = l.begin();
 
     if ( l.empty() && m_parser->otherArgs().size() > 0 ) {
@@ -512,11 +516,11 @@ void PrtGet::install( bool update, bool group, bool dependencies )
     if ( args.size() == 1 ) {
         for ( ; it != args.end(); ++it ) {
             string s = *it;
-            if ( !update && m_pkgDB.isInstalled( s ) ) {
+            if ( !update && m_pkgDB->isInstalled( s ) ) {
                 cout << "package " << s << " is installed" << endl;
                 m_returnValue = PG_GENERAL_ERROR;
                 return;
-            } else if ( update && !m_pkgDB.isInstalled( s ) ) {
+            } else if ( update && !m_pkgDB->isInstalled( s ) ) {
                 // can't upgrade
                 cout << "package " << s << " is not installed" << endl;
                 m_returnValue = PG_GENERAL_ERROR;
@@ -549,7 +553,7 @@ void PrtGet::install( bool update, bool group, bool dependencies )
 
         list<string> deps;
         for (; it != depRef.end(); ++it) {
-            if (!m_pkgDB.isInstalled(*it)) {
+            if (!m_pkgDB->isInstalled(*it)) {
                 deps.push_back(*it);
             }
         }
@@ -672,7 +676,7 @@ void PrtGet::printDepends( bool simpleListing )
             cout << "-- dependencies ([i] = installed)" << endl;
             list<string>::const_iterator it = deps.begin();
             for ( ; it != deps.end(); ++it ) {
-                if ( m_pkgDB.isInstalled( *it ) ) {
+                if ( m_pkgDB->isInstalled( *it ) ) {
                     cout << "[i] ";
                 } else {
                     cout << "[ ] ";
@@ -739,7 +743,7 @@ void PrtGet::printQuickDiff()
 {
     initRepo();
 
-    const map<string, string>& installed = m_pkgDB.installedPackages();
+    const map<string, string>& installed = m_pkgDB->installedPackages();
     map<string, string>::const_iterator it = installed.begin();
     const Package* p = 0;
     for ( ; it != installed.end(); ++it ) {
@@ -781,7 +785,7 @@ void PrtGet::printDiff()
     // check whether ports to be checked are installed
     list< string >::iterator checkIt = l.begin();
     for ( ; checkIt != l.end(); ++checkIt ) {
-        if ( ! m_pkgDB.isInstalled( *checkIt )  ) {
+        if ( ! m_pkgDB->isInstalled( *checkIt )  ) {
             cerr << "Port not installed: " << *checkIt << endl;
             m_returnValue = PG_GENERAL_ERROR;
             return;
@@ -789,7 +793,7 @@ void PrtGet::printDiff()
     }
 #endif
 
-    const map<string, string>& installed = m_pkgDB.installedPackages();
+    const map<string, string>& installed = m_pkgDB->installedPackages();
     map<string, string>::const_iterator it = installed.begin();
     const Package* p = 0;
     int count = 0;
@@ -1133,9 +1137,9 @@ void PrtGet::printf()
         StringHelper::replaceAll( sortkey, "%M", p->maintainer() );
 
         string isInst = "no";
-        if ( m_pkgDB.isInstalled( p->name() ) ) {
+        if ( m_pkgDB->isInstalled( p->name() ) ) {
             string ip = p->name() + "-" +
-                m_pkgDB.getPackageVersion( p->name() );
+                m_pkgDB->getPackageVersion( p->name() );
             if ( ip == p->name() + "-" + p->version() + "-" + p->release() ) {
                 isInst = "yes";
             } else {
@@ -1227,7 +1231,7 @@ void PrtGet::printDependendent()
     set<const Package*>::iterator it2 = dependent.begin();
     for ( ; it2 != dependent.end(); ++it2 ) {
         const Package* p = *it2;
-        if ( m_parser->all() || m_pkgDB.isInstalled( p->name() ) ) {
+        if ( m_parser->all() || m_pkgDB->isInstalled( p->name() ) ) {
             cout << p->name();
             if ( m_parser->verbose() > 0 ) {
                 cout << " " << p->version() << "-" << p->release();
@@ -1249,7 +1253,7 @@ void PrtGet::sysup()
     list<string> packagesToUpdate;
     list<string> sortedList;
 
-    const map<string, string>& installed = m_pkgDB.installedPackages();
+    const map<string, string>& installed = m_pkgDB->installedPackages();
     map<string, string>::const_iterator it = installed.begin();
     const Package* p = 0;
     for ( ; it != installed.end(); ++it ) {
@@ -1314,7 +1318,7 @@ void PrtGet::expandWildcardsPkgDB( const list<char*>& in,
     list<char*>::const_iterator it = in.begin();
     for ( ; it != in.end(); ++it ) {
         map<string, string> l;
-        m_pkgDB.getMatchingPackages( *it, l );
+        m_pkgDB->getMatchingPackages( *it, l );
         map<string, string>::iterator iit = l.begin();
         for ( ; iit != l.end(); ++iit ) {
             target[iit->first] = iit->second;
@@ -1341,7 +1345,7 @@ void PrtGet::current()
 {
     assertExactArgCount(1);
 
-    const map<string, string>& installed = m_pkgDB.installedPackages();
+    const map<string, string>& installed = m_pkgDB->installedPackages();
     map<string, string>::const_iterator it = installed.begin();
     string search = *(m_parser->otherArgs().begin());
 
@@ -1457,7 +1461,7 @@ void PrtGet::listLocked()
         m_returnValue = PG_GENERAL_ERROR;
     }
 
-    const map<string, string>& l = m_pkgDB.installedPackages();
+    const map<string, string>& l = m_pkgDB->installedPackages();
 
     if ( l.empty() ) {
         return;
@@ -1474,7 +1478,7 @@ void PrtGet::listLocked()
     for ( ; it != lockedPackages.end(); ++it ) {
         cout << *it;
         if ( m_parser->verbose() > 0 ) {
-            cout << " " << m_pkgDB.getPackageVersion(*it);
+            cout << " " << m_pkgDB->getPackageVersion(*it);
         }
         if ( m_parser->verbose() > 1 ) {
             const Package* p = m_repo->getPackage( *it );
@@ -1589,6 +1593,8 @@ void PrtGet::cat()
 void PrtGet::remove()
 {
     assertMinArgCount(1);
+    
+    readConfig();
 
     list<string> removed;
     list<string> failed;
@@ -1598,11 +1604,24 @@ void PrtGet::remove()
         cout << "*** " << m_appName << ": test mode" << endl;
     }
 
+    string command = "pkgrm";
+    if (m_config->removeCommand() != "") {
+        command = m_config->removeCommand();
+    }
+
     const list<char*>& args = m_parser->otherArgs();
     list<char*>::const_iterator it = args.begin();
     for ( ; it != args.end(); ++it ) {
-        if (m_pkgDB.isInstalled(*it)) {
-            Process proc("pkgrm", *it);
+        if (m_pkgDB->isInstalled(*it)) {
+            // TODO: prettify
+            string args = "";
+            if (m_parser->installRoot() != "") {
+                args = "-r " + m_parser->installRoot() + " ";
+            }
+            args += (m_parser->pkgrmArgs() + " " + *it);
+
+            Process proc(command, args);
+            cout << "1" << command << " 2 " << args << endl;
             if (m_parser->isTest() || proc.executeShell() == 0) {
                 removed.push_back(*it);
             } else {
@@ -1703,7 +1722,7 @@ void PrtGet::printDependTree()
             cout << ", '-->' = seen before";
         }
         cout << ")" << endl;
-        if ( m_pkgDB.isInstalled( *it ) ) {
+        if ( m_pkgDB->isInstalled( *it ) ) {
             cout << "[i] ";
         } else {
             cout << "[ ] ";
@@ -1722,7 +1741,7 @@ void PrtGet::printDepsLevel(int indent, const Package* package)
     StringHelper::split(package->dependencies(), ',', deps);
     list<string>::iterator it = deps.begin();
     for (; it != deps.end(); ++it) {
-        if ( m_pkgDB.isInstalled( *it ) ) {
+        if ( m_pkgDB->isInstalled( *it ) ) {
             cout << "[i] ";
         } else {
             cout << "[ ] ";
@@ -1792,6 +1811,19 @@ void PrtGet::dumpConfig()
         cout.fill( ' ' );
         cout << "Add command: " << m_config->addCommand() << endl;
     }
+    if (m_config->removeCommand() != "") {
+        cout.setf( ios::left, ios::adjustfield );
+        cout.width( 20 );
+        cout.fill( ' ' );
+        cout << "Remove command: " << m_config->removeCommand() << endl;
+    }
+    if (m_config->runscriptCommand() != "") {
+        cout.setf( ios::left, ios::adjustfield );
+        cout.width( 20 );
+        cout.fill( ' ' );
+        cout << "Runscript command: " << m_config->runscriptCommand() << endl;
+    }
+    
     cout.setf( ios::left, ios::adjustfield );
     cout.width( 20 );
     cout.fill( ' ' );

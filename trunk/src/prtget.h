@@ -86,7 +86,7 @@ public:
     void listLocked();
 
     void fsearch();
-    
+
     void dumpConfig();
 
     static bool greaterThan( const string& v1, const string& v2 );
@@ -115,7 +115,7 @@ protected:
                               list<string>& target );
 
     Repository* m_repo;
-    PkgDB m_pkgDB;
+    PkgDB* m_pkgDB;
     Configuration* m_config;
     InstallTransaction* m_currentTransaction;
 

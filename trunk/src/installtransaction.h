@@ -35,11 +35,11 @@ class InstallTransaction
 public:
     InstallTransaction( const list<char*>& names,
                         const Repository* repo,
-                        PkgDB& pkgDB,
+                        PkgDB* pkgDB,
                         const Configuration* config );
     InstallTransaction( const list<string>& names,
                         const Repository* repo,
-                        PkgDB& pkgDB,
+                        PkgDB* pkgDB,
                         const Configuration* config );
 
     /*! Result of an installation */
@@ -58,7 +58,7 @@ public:
         NO_LOG_FILE,         /*!< no log file specified */
         CANT_LOCK_LOG_FILE   /*!< can't create lock for log file */
     };
-    
+
     enum State {
         EXEC_SUCCESS,
         FAILED,
@@ -74,7 +74,7 @@ public:
         State postState;
         bool hasReadme;
     };
-    
+
     InstallResult install( const ArgParser* parser,
                            bool update,
                            bool group );
@@ -99,7 +99,7 @@ private:
 
     static string getPkgDest();
 
-    PkgDB& m_pkgDB;
+    PkgDB* m_pkgDB;
     DepResolver m_resolver;
     const Repository* m_repo;
 

@@ -19,7 +19,7 @@
 
 [ ] timestamps for the log file 
 [ ] --quiet mode; suppress output of pkgmk and pkgadd
-[ ] create a separate port for the bash-completion
+[x] create a separate port for the bash-completion
 
 ???
 [ ] prt-get rm and cd

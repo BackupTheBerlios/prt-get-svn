@@ -1,4 +1,7 @@
-* 0.5.4p1         30.10.2003  Johannes Winkelmann
+* 0.5.4p2       17.11.2003  Johannes Winkelmann
+- fix bug in "at least X arguments" after getting several complaints
+
+* 0.5.4p1       30.10.2003  Johannes Winkelmann
 - fix message when called without argument
 - Fix duplicate prtdir ignoring error (when using filters)
 

@@ -9,6 +9,9 @@
 //  (at your option) any later version.
 ////////////////////////////////////////////////////////////////////////
 
+// Get a test application with the following command:
+// g++ -o vcomp -DTEST stringhelper.cpp versioncomparator.cpp
+
 
 #include <string>
 #include <cctype>
@@ -79,6 +82,22 @@ COMP_RESULT compareVersions(const string& v1, const string& v2)
                             } else if (subtokens1[k][0] > subtokens2[k][0]) {
                                 return GREATER;
                             }
+                        } else {
+                            // smart guessing...
+                            // leaving out 'test', 'pre' and 'rc'
+                            static const string versions = 
+                                "alpha beta gamma delta";
+                            string::size_type pos1 = 
+                                versions.find(subtokens1[k]);
+                            string::size_type pos2 = 
+                                versions.find(subtokens2[k]);
+                            if (pos1 != string::npos && pos2 != string::npos) {
+                                if (pos1 < pos2) {
+                                    return LESS;
+                                } else if (pos1 > pos2) {
+                                    return GREATER;
+                                }
+                            }
                         }
 
                         if (subtokens1[k] != subtokens2[k]) {
@@ -140,13 +159,13 @@ void tokenizeMixed(const string& s, vector<string>& tokens)
 /*
   find last - (for release) -> version, release
   subdivide version in blocks, where a block is separated by any of
-      the following: [-_]
+  the following: [-_]
 
   -> list of blocks, e.g.
-   .  1.4.2-pre1-2 ->  [ (1.4.2) (-pre1) (2) ]
-   .  1.4.2pre1-1  ->  [ (1.4.2pre1) (-1) ]
-   .  1_2_2pre2-2  ->  [ (1) (2) (2pre2) (2)
- */
+  .  1.4.2-pre1-2 ->  [ (1.4.2) (-pre1) (2) ]
+  .  1.4.2pre1-1  ->  [ (1.4.2pre1) (-1) ]
+  .  1_2_2pre2-2  ->  [ (1) (2) (2pre2) (2)
+*/
 void tokenizeIntoBlocks(const string& version, vector<string>& blocks)
 {
     string v = version;
@@ -220,6 +239,7 @@ int main(int argc, char** argv)
         check("1.4.2aa-2", "1.4.2bb-2", UNDEFINED);
         check("1.4.2a1-2", "1.4.2a2-2", LESS);
         check("1.4.2b1-2", "1.4.2a2-2", GREATER);
+        check("1.4.2beta3", "1.4.2alpha2", GREATER);
     } else {
         check(argv[1], argv[2], UNDEFINED, false);
     }

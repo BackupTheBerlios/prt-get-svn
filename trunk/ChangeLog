@@ -4,6 +4,7 @@
 - implement shortcuts to frequentily used pkgmk/pkgadd options
 - make -f do 'pkgadd -f'
 - add new versioncomparator class
+- implement 'alpha' < 'beta' < 'gamma' < 'delta'
 
 * 0.5.7         16.07.2004  Johannes Winkelmann
 - add the --install-root argument to allow installation to a different root

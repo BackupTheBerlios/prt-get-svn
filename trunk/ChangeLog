@@ -3,7 +3,7 @@
 - add way to use external dependency file
 - Add some missing headers for compilation with gcc 2.95
 - update bash completion for isinst
-- add deptree command
+- add deptree command (--all for all deps)
 
 * 0.5.4p2       17.11.2003  Johannes Winkelmann
 - fix bug in "at least X arguments" after getting several complaints

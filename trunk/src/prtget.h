@@ -68,6 +68,8 @@ public:
     void ls();
     void edit();
 
+    void remove();
+
     void setLock( bool lock );
     void listLocked();
 

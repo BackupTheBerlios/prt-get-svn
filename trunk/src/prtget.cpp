@@ -1440,3 +1440,63 @@ void PrtGet::cat()
         exit( -1 );
     }
 }
+
+void PrtGet::remove()
+{
+    if ( m_parser->otherArgs().size() < 1 ) {
+        cerr << m_appName << " " << m_parser->commandName()
+             <<  " takes at least one argument" << endl;
+        exit( -1 );
+    }
+
+    list<string> removed;
+    list<string> failed;
+    list<string> notInstalled;
+    
+    const list<char*>& args = m_parser->otherArgs();
+    list<char*>::const_iterator it = args.begin();
+    for ( ; it != args.end(); ++it ) {
+        if (m_pkgDB.isInstalled(*it)) {
+            Process proc("pkgrm", *it); 
+            if (proc.executeShell() == 0) {
+                removed.push_back(*it);
+            } else {
+                failed.push_back(*it);
+            }
+        } else {
+            notInstalled.push_back(*it);
+        }
+    }
+    
+    if ( removed.size() ) {
+        cout << endl << "-- Packages removed"
+             << endl;
+        list<string>::const_iterator it = removed.begin();
+
+        for ( ; it != removed.end(); ++it ) {
+            cout << *it << endl;
+        }
+    }
+
+    if ( failed.size() ) {
+        cout << endl << "-- Packages where removal failed"
+             << endl;
+        list<string>::const_iterator it = failed.begin();
+
+        for ( ; it != failed.end(); ++it ) {
+            cout << *it << endl;
+        }
+    }
+
+    if ( notInstalled.size() ) {
+        cout << endl << "-- Packages which where not installed"
+             << endl;
+        list<string>::const_iterator it = notInstalled.begin();
+
+        for ( ; it != notInstalled.end(); ++it ) {
+            cout << *it << endl;
+        }
+    }
+    
+    
+}

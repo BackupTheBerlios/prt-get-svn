@@ -36,7 +36,7 @@ public:
                 QUICKDIFF, SHOW_VERSION, CREATE_CACHE, PATH,
                 LISTINST, PRINTF, README, DEPENDENT, SYSUP,
                 CURRENT, FSEARCH, LOCK, UNLOCK, LISTLOCKED,
-                CAT, LS, EDIT };
+                CAT, LS, EDIT, REMOVE };
 
     bool isCommandGiven() const;
     bool isForced() const;

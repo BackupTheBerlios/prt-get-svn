@@ -142,6 +142,9 @@ int main( int argc, char** argv )
         case ArgParser::EDIT:
             prtGet.edit();
             break;
+        case ArgParser::REMOVE:
+            prtGet.remove();
+            break;
 
         default:
             cout << "unknown command" << endl;

@@ -18,7 +18,7 @@ _prt-get()
                     list info path search dsearch fsearch printf cache \
                     dependent sysup current lock unlock listlocked \
                     diff quickdiff depends quickdep dup isinst \
-                    cat ls edit' $cur ))
+                    cat ls edit remove' $cur ))
         fi
 
        

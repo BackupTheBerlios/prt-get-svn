@@ -1658,9 +1658,14 @@ void PrtGet::printDependTree()
         m_returnValue = PG_GENERAL_ERROR;
         return;
     }
-    
+
     if (p->dependencies().length() > 0) {
-        cout << "-- dependencies ([i] = installed)" << endl;
+        
+        cout << "-- dependencies ([i] = installed";
+        if (!m_parser->all()) {
+            cout << ", '-->' = seen before";
+        }
+        cout << ")" << endl;
         if ( m_pkgDB.isInstalled( *it ) ) {
             cout << "[i] ";
         } else {
@@ -1669,15 +1674,17 @@ void PrtGet::printDependTree()
         cout << p->name() << endl;
         printDepsLevel(2, p);
     }
-    
+
 }
 
 void PrtGet::printDepsLevel(int indent, const Package* package)
 {
+    static map<string, bool> shownMap;
+    
     list<string> deps;
     StringHelper::split(package->dependencies(), ',', deps);
     list<string>::iterator it = deps.begin();
-    for (; it != deps.end(); ++it) {        
+    for (; it != deps.end(); ++it) {
         if ( m_pkgDB.isInstalled( *it ) ) {
             cout << "[i] ";
         } else {
@@ -1689,8 +1696,20 @@ void PrtGet::printDepsLevel(int indent, const Package* package)
         cout << *it;
         const Package* p = m_repo->getPackage( *it );
         if (p) {
-            cout << endl;
-            printDepsLevel(indent+2, p);
+            if  (p->dependencies().length() > 0) {
+                map<string, bool>::iterator shownIt = shownMap.find(*it);
+                if (shownIt != shownMap.end()) {
+                    cout << " -->" << endl;;
+                } else {
+                    cout << endl;
+                    printDepsLevel(indent+2, p);
+                    if (!m_parser->all()) {
+                        shownMap[*it] = true;
+                    }
+                }            
+            } else {
+                cout << endl;
+            }
         } else {
             cout << " (not found in ports tree)" << endl;
         }

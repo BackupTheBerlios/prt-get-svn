@@ -145,6 +145,13 @@ void PrtGet::printUsage()
          << endl;
     cout << "                --test              test mode" << endl;
     cout << "                --log               write log file"<< endl;
+    cout << "                --pre-install       execute pre-install script" 
+         << endl;
+    cout << "                --post-install      execute post-install script" 
+         << endl;
+    cout << "                --install-scripts   execute " 
+         << "pre-install and post-install script" 
+         << endl;
 
     cout << "\nSYSTEM UPDATE " << endl;
     cout << "  sysup [opt]                       update all outdated ports"

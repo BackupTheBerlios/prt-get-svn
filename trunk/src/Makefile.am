@@ -17,7 +17,8 @@ prt_get_SOURCES= argparser.cpp argparser.h\
                  lockfile.cpp lockfile.h \
                  file.cpp file.h \
                  locker.cpp locker.h \
-		 versioncomparator.cpp versioncomparator.h
+		 versioncomparator.cpp versioncomparator.h \
+		 datafileparser.cpp datafileparser.h
 
 EXTRA_DIST = prt-get.conf
 

@@ -36,6 +36,7 @@ using namespace std;
 #include "versioncomparator.h"
 #include "file.h"
 #include "process.h"
+#include "datafileparser.h"
 using namespace StringHelper;
 
 
@@ -112,7 +113,7 @@ void PrtGet::printUsage()
          << endl;
     cout << "  current  <port>            print installed version of port"
          << endl;
-    
+
     cout << "\nDIFFERENCES / CHECK FOR UPDATES" << endl;
     cout << "  diff     <port1 port2...>  list outdated packages (or check "
          << "args for change)" << endl;
@@ -368,6 +369,11 @@ void PrtGet::printInfo()
             StringHelper::replaceAll( filesString, " ", "," );
             cout << "Files:        " << filesString << endl;
         }
+        
+        if ( m_parser->verbose() > 0 && p->hasReadme()) {
+            cout << "\n-- README ------" << endl;
+            readme();
+        }
 
     } else {
         cerr << "Package " << arg << " not found" << endl;
@@ -433,33 +439,10 @@ void PrtGet::initRepo( bool listDuplicate )
     }
 
     std::string depFile = m_config->depFile();
-    if (depFile != "") {
-        FILE* depFP = fopen(depFile.c_str(), "r");
-        char buffer[512];
-        string input;
-        if (depFP) {
-
-            map<string, string> depMap;
-            while (fgets(buffer, 512, depFP)) {
-                input = buffer;
-                input = stripWhiteSpace(input);
-
-                if (input.length() > 0 && input[0] != '#') {
-                    string::size_type pos = input.find(":");
-                    if (pos != string::npos) {
-                        string name = stripWhiteSpace(input.substr(0, pos));
-                        string deps = stripWhiteSpace(input.substr(pos+1));
-                        deps = StringHelper::replaceAll(deps, "  ", " ");
-                        deps = StringHelper::replaceAll(deps, " ", ",");
-                        deps = StringHelper::replaceAll(deps, ",,", ",");
-
-                        depMap[name] = deps;
-                    }
-                }
-            }
+    if (depFile != "") {        
+        map<string, string> depMap;
+        if (DataFileParser::parse(depFile, depMap)) {
             m_repo->addDependencies(depMap);
-
-            fclose(depFP);
         } else {
             cerr << "Warning: Failed to open dependency file "
                  << depFile << endl;
@@ -777,7 +760,7 @@ void PrtGet::printQuickDiff()
         if ( !m_locker.isLocked( it->first ) ) {
             p = m_repo->getPackage( it->first );
             if ( p ) {
-                if (greaterThan(p->version() + "-" + p->release(), 
+                if (greaterThan(p->version() + "-" + p->release(),
                                 it->second)) {
                     cout <<  it->first.c_str() << " ";
                 }
@@ -1058,15 +1041,15 @@ void PrtGet::createCache()
 bool PrtGet::greaterThan( const string& v1, const string& v2 )
 {
     using namespace VersionComparator;
-    
+
     if (v1 == v2) {
         return false;
     }
 
-    
-    if (m_parser->preferHigher() || 
+
+    if (m_parser->preferHigher() ||
         (m_config->preferHigher() && !m_parser->strictDiff())) {
-        
+
         COMP_RESULT result = compareVersions(v1, v2);
         return (result == GREATER);
     }

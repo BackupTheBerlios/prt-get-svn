@@ -236,7 +236,7 @@ int main(int argc, char** argv)
         check("1.4.2_3-1", "1.4.2_3-2", LESS);
         check("1.4.2_3-1", "1.4.2_1-1", GREATER);
 
-        check("1.4.2-alpha2", "1.4.2-beta1", UNDEFINED);
+        check("1.4.2-alpha2", "1.4.2-beta1", LESS);
         check("1.4.2a-2", "1.4.2a-3", LESS);
         check("1.4.2a-2", "1.4.2b-2", LESS);
         check("1.4.2aa-2", "1.4.2bb-2", UNDEFINED);

@@ -28,7 +28,10 @@ Configuration::Configuration( const std::string& configFile,
       m_appendLog( false ),
       m_logFilePattern( "" ),
       m_depFile( "" ),
-      m_readmeMode( VERBOSE_README )
+      m_cacheFile( "" ),
+      m_readmeMode( VERBOSE_README ),
+      m_runScripts( false ),
+      m_makeCommand( "" ), m_addCommand( "" )
 {
 
 }
@@ -48,49 +51,7 @@ bool Configuration::parse()
         s = input;
         s = getValueBefore( s, '#' );
         s = stripWhiteSpace( s );
-        if ( !s.empty() ) {
-            if ( startwith_nocase( s, "prtdir" ) ) {
-                s = stripWhiteSpace( s.replace( 0, 6, "" ) );
-                string path = stripWhiteSpace( getValueBefore( s, ':' ) );
-                string packages = getValue( s, ':' );
-                DIR* dir = opendir( path.c_str() );
-                if ( dir ) {
-                    closedir( dir );
-                    m_rootList.push_back( make_pair( path, packages ) );
-                } else {
-                    cerr << "[Config error: can't access " << path
-                         << "]" << endl;
-                }
-            } else if ( startwith_nocase( s, "cachefile" ) ) {
-                s = stripWhiteSpace( s.replace( 0, 9, "" ) );
-                m_cacheFile = s;
-            } else if ( startwith_nocase( s, "writelog" ) ) {
-                s = stripWhiteSpace( s.replace( 0, 8, "" ) );
-                if ( s == "enabled" ) {
-                    // it's already set to false, so we can just enable it.
-                    // like this, the command line switch works as well
-                    m_writeLog = true;
-                }
-            } else if ( startwith_nocase( s, "logfile" ) ) {
-                s = stripWhiteSpace( s.replace( 0, 7, "" ) );
-                m_logFilePattern = s;
-            } else if ( startwith_nocase( s, "depfile" ) ) {
-                s = stripWhiteSpace( s.replace( 0, 7, "" ) );
-                m_depFile = s;
-            } else if ( startwith_nocase( s, "logmode" ) ) {
-                s = stripWhiteSpace( s.replace( 0, 7, "" ) );
-                if ( s == "append" ) {
-                    m_appendLog = true;
-                }
-            } else if ( startwith_nocase( s, "readme" ) ) {
-                s = stripWhiteSpace( s.replace( 0, 6, "" ) );
-                if ( s == "compact" ) {
-                    m_readmeMode = COMPACT_README;
-                } else if ( s == "disabled" ) {
-                    m_readmeMode = NO_README;
-                }
-            }
-        }
+        parseLine(s);
     }
 
     fclose( fp );
@@ -132,4 +93,104 @@ Configuration::ReadmeMode Configuration::readmeMode() const
 std::string Configuration::depFile() const
 {
     return m_depFile;
+}
+
+
+std::string Configuration::cacheFile() const
+{
+    return m_cacheFile;
+}
+
+
+void Configuration::addConfig(const string& line,
+                              bool configSet,
+                              bool configPrepend)
+{
+    if (configSet && startwith_nocase( line, "prtdir" )) {
+        m_rootList.clear();
+    }
+    parseLine(line, configPrepend);
+}
+
+/*!
+  parse a line and set the configuration data accordingly; if \a
+  prepend is set, prepend the data for configuration options which are lists
+ */
+void Configuration::parseLine(const string& line, bool prepend)
+{
+    string s = line;
+    if ( s.empty() ) {
+        return;
+    }
+
+    if ( startwith_nocase( s, "prtdir" ) ) {
+        s = stripWhiteSpace( s.replace( 0, 6, "" ) );
+        string path = stripWhiteSpace( getValueBefore( s, ':' ) );
+        string packages = getValue( s, ':' );
+        DIR* dir = opendir( path.c_str() );
+        if ( dir ) {
+            closedir( dir );
+
+            if (prepend) {
+                m_rootList.push_front( make_pair( path, packages ) );
+            } else {
+                m_rootList.push_back( make_pair( path, packages ) );
+            }
+        } else {
+            cerr << "[Config error: can't access " << path
+                 << "]" << endl;
+        }
+    } else if ( startwith_nocase( s, "cachefile" ) ) {
+        s = stripWhiteSpace( s.replace( 0, 9, "" ) );
+        m_cacheFile = s;
+    } else if ( startwith_nocase( s, "writelog" ) ) {
+        s = stripWhiteSpace( s.replace( 0, 8, "" ) );
+        if ( s == "enabled" ) {
+            // it's already set to false, so we can just enable it.
+            // like this, the command line switch works as well
+            m_writeLog = true;
+        }
+    } else if ( startwith_nocase( s, "logfile" ) ) {
+        s = stripWhiteSpace( s.replace( 0, 7, "" ) );
+        m_logFilePattern = s;
+    } else if ( startwith_nocase( s, "depfile" ) ) {
+        s = stripWhiteSpace( s.replace( 0, 7, "" ) );
+        m_depFile = s;
+    } else if ( startwith_nocase( s, "logmode" ) ) {
+        s = stripWhiteSpace( s.replace( 0, 7, "" ) );
+        if ( s == "append" ) {
+            m_appendLog = true;
+        }
+    } else if ( startwith_nocase( s, "readme" ) ) {
+        s = stripWhiteSpace( s.replace( 0, 6, "" ) );
+        if ( s == "compact" ) {
+            m_readmeMode = COMPACT_README;
+        } else if ( s == "disabled" ) {
+            m_readmeMode = NO_README;
+        }
+    } else if ( startwith_nocase( s, "runscripts" ) ) {
+        s = stripWhiteSpace( s.replace( 0, 10, "" ) );
+        if ( s == "yes" ) {
+            m_runScripts = true;
+        }
+    } else if ( startwith_nocase( s, "makecommand" ) ) {
+        m_makeCommand = stripWhiteSpace( s.replace( 0, 11, "" ) );
+    } else if ( startwith_nocase( s, "addcommand" ) ) {
+        m_addCommand = stripWhiteSpace( s.replace( 0, 10, "" ) );
+    }
+}
+
+bool Configuration::runScripts() const
+{
+    return m_runScripts;
+}
+
+std::string Configuration::makeCommand() const
+{
+    return m_makeCommand;
+}
+
+std::string Configuration::addCommand() const
+{
+    return m_addCommand;
 }

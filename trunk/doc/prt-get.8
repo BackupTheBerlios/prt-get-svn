@@ -340,6 +340,9 @@ Edit the file using the editor specified in the $EDITOR environment variable
 .B help
 Shows a help screen
 
+.TP 
+.B dumpconfig
+Dump the configuration to the current terminal 
 
 .TP 
 .B version 
@@ -372,6 +375,22 @@ Execute post-install script if it's there
 .TP 
 .B \-\-install-scripts
 Execute pre-install and post-install script if they're there
+
+.TP 
+.B \-\-no-std-config
+Don't parse the default configuration file
+
+.TP 
+.B \-\-config-prepend=<string>
+Prepend <string> to configuration
+
+.TP 
+.B \-\-config-append=<string>
+Append <string> to configuration
+
+.TP 
+.B \-\-config-set=<string>
+Set <string> in configuration, overriding configuration file
 
 
 .TP 

@@ -72,6 +72,9 @@ _prt-get()
                                                     --install-scripts \
                                                     --log --test \
                                                     --config \
+					            --config-append= \
+					            --config-prepend= \
+					            --config-set= \
                                                     --aargs= --margs=' \
                                                      -- $cur ) )
                         ;;

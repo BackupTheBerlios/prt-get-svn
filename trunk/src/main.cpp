@@ -151,7 +151,9 @@ int main( int argc, char** argv )
         case ArgParser::DEPTREE:
             prtGet.printDependTree();
             break;
-
+        case ArgParser::DUMPCONFIG:
+            prtGet.dumpConfig();
+            break;
         default:
             cerr << "unknown command" << endl;
             break;

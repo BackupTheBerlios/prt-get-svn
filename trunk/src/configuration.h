@@ -36,8 +36,18 @@ public:
 
     enum ReadmeMode { VERBOSE_README, COMPACT_README, NO_README };
     ReadmeMode readmeMode() const;
-    
+
     std::string depFile() const;
+    std::string cacheFile() const;
+
+    bool runScripts() const;
+
+    void addConfig(const std::string& line,
+                   bool configSet,
+                   bool configPrepend);
+    
+    std::string makeCommand() const;
+    std::string addCommand() const;
 
 private:
     std::string m_configFile;
@@ -54,6 +64,14 @@ private:
     bool m_appendLog;
 
     ReadmeMode m_readmeMode;
+
+    bool m_runScripts;
+    
+    std::string m_makeCommand;
+    std::string m_addCommand;
+
+
+    void parseLine(const std::string& line, bool prepend=false);
 };
 
 #endif /* _CONFIGURATION_H_ */

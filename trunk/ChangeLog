@@ -1,3 +1,16 @@
+* 0.5.6		06.01.2004  Johannes Winkelmann
+- add four new command line arguments:
+  --no-std-config            Don't parse default configuration file
+  --config-prepend=<string>  Prepend <string> to configuration
+  --config-append=<string>   Append <string> to configuration
+  --config-set=<string>      Set configuration data, overriding config file
+- add new command: dumpconfig
+- respect 'cachefile' setting in configuration (did anyone ever use this??)
+- add 'runscripts' configuration variable to (equivalent to --install-scripts)
+- dump readme and runscripts configuration in dumpConfig()
+- add 'makecommand' and 'addcommand' to config file to make prt-get use
+  another command than pkgmk and pkgadd
+
 * 0.5.5p1       23.03.2004  Johannes Winkelmann
 - Let Pkgfile's dependencies take precedence over deplist
 

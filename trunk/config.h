@@ -79,7 +79,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.5.5pre1"
+#define VERSION "0.5.6"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

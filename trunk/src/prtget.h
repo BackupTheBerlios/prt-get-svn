@@ -86,6 +86,8 @@ public:
     void listLocked();
 
     void fsearch();
+    
+    void dumpConfig();
 
     static bool greaterThan( const string& v1, const string& v2 );
 
@@ -94,7 +96,7 @@ public:
     SignalHandler::HandlerResult handleSignal( int signal );
 
 protected:
-    
+
     void printDepsLevel(int indent, const Package* package);
 
     void executeTransaction( InstallTransaction& transaction,

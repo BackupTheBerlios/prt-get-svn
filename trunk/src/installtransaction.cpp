@@ -214,7 +214,7 @@ InstallTransaction::installPackage( const Package* package,
 
     // -- pre-install
     struct stat statData;
-    if (parser->execPreInstall() &&
+    if ((parser->execPreInstall() || m_config->runScripts()) &&
         stat((pkgdir + "/" + "pre-install").c_str(), &statData) == 0) {
         Process preProc( "sh", pkgdir + "/" + "pre-install", fdlog );
         if (preProc.executeShell()) {
@@ -226,6 +226,10 @@ InstallTransaction::installPackage( const Package* package,
 
     // -- build
     string cmd = "pkgmk";
+    if (m_config->makeCommand() != "") {
+        cmd = m_config->makeCommand();
+    }
+    
     string args = "-d " + parser->pkgmkArgs();
     Process makeProc( cmd, args, fdlog );
     if ( makeProc.executeShell() ) {
@@ -249,6 +253,9 @@ InstallTransaction::installPackage( const Package* package,
             result = PKGDEST_ERROR;
         } else {
             cmd = "pkgadd";
+            if (m_config->addCommand() != "") {
+                cmd = m_config->addCommand();
+            }
 
             args = "";
             if ( update ) {
@@ -266,7 +273,7 @@ InstallTransaction::installPackage( const Package* package,
             if ( parser->wasCalledAsPrtCached() ) {
                 commandName = "prt-cache";
             }
-            
+
             string message = commandName + ": " + cmd + " " + args;
             cout << message << endl;
             if ( m_config->writeLog() ) {
@@ -279,7 +286,7 @@ InstallTransaction::installPackage( const Package* package,
                 result = PKGADD_FAILURE;
             } else {
                 // exec post install
-                if (parser->execPostInstall() &&
+                if ((parser->execPostInstall()  || m_config->runScripts() ) &&
                     stat((package->path() + "/" + package->name() +
                           "/" + "post-install").c_str(), &statData)
                     == 0) {

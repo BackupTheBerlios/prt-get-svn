@@ -37,7 +37,7 @@ public:
                 LISTINST, PRINTF, README, DEPENDENT, SYSUP,
                 CURRENT, FSEARCH, LOCK, UNLOCK, LISTLOCKED,
                 CAT, LS, EDIT, REMOVE,
-                DEPTREE };
+                DEPTREE, DUMPCONFIG };
 
     bool isCommandGiven() const;
     bool isForced() const;
@@ -47,6 +47,7 @@ public:
     bool wasCalledAsPrtCached() const;
     bool writeLog() const;
     bool hasFilter() const;
+    bool noStdConfig() const;
     bool nodeps() const;
     bool all() const;
     bool execPreInstall() const;
@@ -69,6 +70,11 @@ public:
 
     int verbose() const;
 
+    enum ConfigArgType { CONFIG_SET, CONFIG_APPEND, CONFIG_PREPEND };
+
+    const list< pair<char*, ConfigArgType> > configData() const;
+
+
 private:
 
     bool m_isCommandGiven;
@@ -78,6 +84,7 @@ private:
     bool m_useCache;
     bool m_calledAsPrtCache;
     bool m_hasFilter;
+    bool m_noStdConfig;
 
     bool m_writeLog;
 
@@ -103,9 +110,9 @@ private:
 
     int m_verbose;
 
-
-
     list<char*> m_otherArgs;
+
+    list< pair<char*, ConfigArgType> > m_configData;
 };
 
 #endif /* _ARGPARSER_H_ */

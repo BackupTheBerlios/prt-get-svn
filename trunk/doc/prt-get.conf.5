@@ -42,6 +42,9 @@ readme compact
 
 # use external dependency file
 depfile /var/lib/pkg/opt.dependencies
+
+# execute pre- and post-installs scripts (default no)
+runscripts yes
 .fi
 
 .LP
@@ -73,6 +76,17 @@ file is
 .nf
 <portname1>:<dependency1> <dependency2>
 <portname2>:<dependency1>
+
+.B runscripts
+if set to yes, execute pre- and post-install scripts
+
+.LP
+.B makecommand
+and
+.B addcommand
+can be used to use an alternate command instead of 'pkgmk' (for the
+makecommand) and 'pkgadd' (for the addcommand). These are expert
+options which shouldn't be used in general.
 
 .LP
 The log options are

@@ -182,9 +182,23 @@ void PrtGet::printUsage()
     cout << "                --cache             Use a cache file" << endl;
     cout << "                --config=<file>     Use alternative "
          << "configuration file" << endl;
+
     cout << "                --v                 Show version in listing"
          << endl;
     cout << "                --vv                Show version and decription "          << "in listing" << endl;
+
+
+    cout << "                --no-std-config     Don't parse "
+         << "default configuration file" << endl;
+    cout << "                --config-prepend=.. Prepend '..' to"
+         << " configuration" << endl;
+    cout << "                --config-append=..  Append '..' "
+         << "to configuration" << endl;
+    cout << "                --config-set=..     Set configuration "
+         << "data '..',\n"
+         << "                                       overriding config file"
+         << endl;
+
 }
 
 
@@ -344,6 +358,10 @@ void PrtGet::initRepo( bool listDuplicate )
         m_repo = new Repository();
 
         if ( m_parser->useCache() ) {
+            if (m_config->cacheFile() != "") {
+                m_cacheFile = m_config->cacheFile();
+            }
+
             Repository::CacheReadResult result =
                 m_repo->initFromCache( m_cacheFile );
             if ( result == Repository::ACCESS_ERR  ) {
@@ -567,7 +585,8 @@ void PrtGet::executeTransaction( InstallTransaction& transaction,
     if ( result == InstallTransaction::PACKAGE_NOT_FOUND ) {
         cout << m_appName << ": package(s) not found" << endl;
     } else if ( result == InstallTransaction::PKGMK_EXEC_ERROR ) {
-        cout << m_appName << " couldn't excecute pkgmk. "
+        cout << m_appName << " couldn't excecute pkgmk "
+             << "(or alternative command). "
              << "Make sure it's installed properly" << endl;
     } else if ( result == InstallTransaction::PKGMK_FAILURE ) {
         cout << m_appName << ": error while " << command[0] << endl;
@@ -691,11 +710,24 @@ void PrtGet::readConfig()
         return; // don't initialize twice
     }
     m_config = new Configuration( fName, m_parser );
-    if ( !m_config->parse() ) {
-        cerr << "Can't read config file " << fName
-             << ". Exiting" << endl;
-        m_returnValue = PG_GENERAL_ERROR;
-        return;
+
+    if (!m_parser->noStdConfig()) {
+        if ( !m_config->parse() ) {
+            cerr << "Can't read config file " << fName
+                 << ". Exiting" << endl;
+            m_returnValue = PG_GENERAL_ERROR;
+            return;
+        }
+    }
+
+    const list< pair<char*, ArgParser::ConfigArgType> >& configData =
+        m_parser->configData();
+    list< pair<char*, ArgParser::ConfigArgType> >::const_iterator it =
+        configData.begin();
+    for (; it != configData.end(); ++it) {
+        m_config->addConfig(it->first,
+                            it->second == ArgParser::CONFIG_SET,
+                            it->second == ArgParser::CONFIG_PREPEND);
     }
 }
 
@@ -969,6 +1001,11 @@ void PrtGet::createCache()
     }
 
     initRepo();
+    readConfig();
+    if (m_config->cacheFile() != "") {
+        m_cacheFile = m_config->cacheFile();
+    }
+
     Repository::WriteResult result = m_repo->writeCache( m_cacheFile );
     if ( result == Repository::DIR_ERR ) {
         cerr << "Can't create cache directory " << m_cacheFile << endl;
@@ -1660,7 +1697,7 @@ void PrtGet::printDependTree()
     }
 
     if (p->dependencies().length() > 0) {
-        
+
         cout << "-- dependencies ([i] = installed";
         if (!m_parser->all()) {
             cout << ", '-->' = seen before";
@@ -1680,7 +1717,7 @@ void PrtGet::printDependTree()
 void PrtGet::printDepsLevel(int indent, const Package* package)
 {
     static map<string, bool> shownMap;
-    
+
     list<string> deps;
     StringHelper::split(package->dependencies(), ',', deps);
     list<string>::iterator it = deps.begin();
@@ -1706,7 +1743,7 @@ void PrtGet::printDepsLevel(int indent, const Package* package)
                     if (!m_parser->all()) {
                         shownMap[*it] = true;
                     }
-                }            
+                }
             } else {
                 cout << endl;
             }
@@ -1714,4 +1751,102 @@ void PrtGet::printDepsLevel(int indent, const Package* package)
             cout << " (not found in ports tree)" << endl;
         }
     }
+}
+
+void PrtGet::dumpConfig()
+{
+    readConfig();
+
+    if (!m_parser->noStdConfig()) {
+        string fName = CONF_FILE;
+        if ( m_parser->isAlternateConfigGiven() ) {
+            fName = m_parser->alternateConfigFile();
+        }
+        cout.setf( ios::left, ios::adjustfield );
+        cout.width( 20 );
+        cout.fill( ' ' );
+        cout << "Configuration file: " << fName << endl;
+    }
+
+    if (m_config->depFile() != "") {
+        cout.setf( ios::left, ios::adjustfield );
+        cout.width( 20 );
+        cout.fill( ' ' );
+        cout << "Dependency file: " << m_config->depFile() << endl;
+    }
+    if (m_config->cacheFile() != "") {
+        cout.setf( ios::left, ios::adjustfield );
+        cout.width( 20 );
+        cout.fill( ' ' );
+        cout << "Cache file: " << m_config->cacheFile() << endl;
+    }
+    if (m_config->makeCommand() != "") {
+        cout.setf( ios::left, ios::adjustfield );
+        cout.width( 20 );
+        cout.fill( ' ' );
+        cout << "Make command file: " << m_config->makeCommand() << endl;
+    }
+    if (m_config->addCommand() != "") {
+        cout.setf( ios::left, ios::adjustfield );
+        cout.width( 20 );
+        cout.fill( ' ' );
+        cout << "Add command: " << m_config->addCommand() << endl;
+    }
+    cout.setf( ios::left, ios::adjustfield );
+    cout.width( 20 );
+    cout.fill( ' ' );
+    cout << "Run scripts: " <<(m_config->runScripts() ? "yes" : "no" )
+         << endl;
+
+    cout.setf( ios::left, ios::adjustfield );
+    cout.width( 20 );
+    cout.fill( ' ' );
+    cout << "Readme mode:  ";
+    switch (m_config->readmeMode()) {
+        case Configuration::VERBOSE_README:
+            cout << "verbose";
+            break;
+        case Configuration::COMPACT_README:
+            cout << "compact";
+            break;
+        case Configuration::NO_README:
+            cout << "off";
+            break;
+    }
+    cout << endl;
+
+    cout << endl;
+
+    if (m_config->logFilePattern() != "") {
+        cout.setf( ios::left, ios::adjustfield );
+        cout.width( 20 );
+        cout.fill( ' ' );
+        cout << "Log file: " << m_config->logFilePattern() << endl;
+    }
+    cout.setf( ios::left, ios::adjustfield );
+    cout.width( 20 );
+    cout.fill( ' ' );
+    cout << "  Write log: " << (m_config->writeLog() ? "yes" : "no" ) << endl;
+    cout.setf( ios::left, ios::adjustfield );
+    cout.width( 20 );
+    cout.fill( ' ' );
+    cout << "  Append log: " <<(m_config->appendLog() ? "yes" : "no" ) << endl;
+
+
+
+    cout << endl;
+    list< pair<string, string> >::const_iterator it =
+        m_config->rootList().begin();
+    cout << "Port "
+         << (m_config->rootList().size() == 1 ? "directory" : "directories")
+         << ": " << endl;
+    for (; it != m_config->rootList().end(); ++it) {
+        cout << " " << it->first;
+        if (it->second != "") {
+            cout << " (" << it->second << ")";
+        }
+        cout << endl;
+    }
+
+
 }

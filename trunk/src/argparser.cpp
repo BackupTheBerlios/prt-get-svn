@@ -33,6 +33,7 @@ ArgParser::ArgParser( int argc, char** argv )
       m_verbose( 0 ),
       m_writeLog( false ),
       m_hasFilter( false ),
+      m_noStdConfig( false ),
       m_nodeps( false ),
       m_all( false ),
       m_execPreInstall( false ),
@@ -110,7 +111,7 @@ const string& ArgParser::alternateConfigFile() const
 */
 bool ArgParser::parse()
 {
-    const int commandCount = 33;
+    const int commandCount = 34;
     string commands[commandCount] = { "list", "search", "dsearch",
                                       "info",
                                       "depends", "install", "depinst",
@@ -121,7 +122,7 @@ bool ArgParser::parse()
                                       "dependent", "sysup", "current",
                                       "fsearch", "lock", "unlock",
                                       "listlocked", "cat", "ls", "edit",
-                                      "remove", "deptree" };
+                                      "remove", "deptree", "dumpconfig" };
 
     Type commandID[commandCount] = { LIST, SEARCH, DSEARCH, INFO,
                                      DEPENDS, INSTALL, DEPINST,
@@ -131,7 +132,8 @@ bool ArgParser::parse()
                                      PATH, LISTINST, PRINTF, README,
                                      DEPENDENT, SYSUP, CURRENT,
                                      FSEARCH, LOCK, UNLOCK, LISTLOCKED,
-                                     CAT, LS, EDIT, REMOVE, DEPTREE };
+                                     CAT, LS, EDIT, REMOVE, DEPTREE,
+                                     DUMPCONFIG };
     if ( m_argc < 2 ) {
         return false;
     }
@@ -187,6 +189,8 @@ bool ArgParser::parse()
             } else if ( s == "--install-scripts" ) {
                 m_execPreInstall = true;
                 m_execPostInstall = true;
+            } else if ( s == "--no-std-config" ) {
+                m_noStdConfig = true;
             }
 
             // substrings
@@ -202,6 +206,14 @@ bool ArgParser::parse()
             } else if ( s.substr( 0, 9 ) == "--config=" ) {
                 m_alternateConfigFile = s.substr( 9 );
                 m_isAlternateConfigGiven = true;
+            } else if ( s.substr( 0, 16 ) == "--config-append=" ) {
+                m_configData.push_back(make_pair(m_argv[i]+16,
+                                                 CONFIG_APPEND ) );
+            } else if ( s.substr( 0, 17 ) == "--config-prepend=" ) {
+                m_configData.push_back(make_pair(m_argv[i]+17,
+                                                 CONFIG_PREPEND ) );
+            } else if ( s.substr( 0, 13 ) == "--config-set=" ) {
+                m_configData.push_back(make_pair(m_argv[i]+13, CONFIG_SET ) );
             } else {
                 m_unknownOption = s;
                 return false;
@@ -284,6 +296,16 @@ bool ArgParser::hasFilter() const
     return m_hasFilter;
 }
 
+
+/*!
+  \return whether there was a --no-std-config argument
+ */
+bool ArgParser::noStdConfig() const
+{
+    return m_noStdConfig;
+}
+
+
 /*!
   \return the --filter="..." string
 */
@@ -326,4 +348,10 @@ bool ArgParser::execPreInstall() const
 bool ArgParser::execPostInstall() const
 {
     return m_execPostInstall;
+}
+
+const list< pair<char*, ArgParser::ConfigArgType> >
+ArgParser::configData() const
+{
+    return m_configData;
 }

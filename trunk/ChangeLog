@@ -3,6 +3,9 @@
 - code: introduce generic argument number checks
 - (re)introduce depinst command
 - fix problem with prt-get fsearch: symlink'ed files are found as well
+- print output while logging (Patch from Logan)
+- redirect output of InstallTransaction::installPackage to log file
+- add %v (version) and %r (release) patterns to the log file name
 
 * 0.5.3p2       29.09.2003  Johannes Winkelmann
 - Fix little bug in prt-get printf: don't print out empty lines (even if

@@ -15,23 +15,12 @@
   - Transaction handler
 
 
-0.5.2:
-- update manual
+0.5.x:
 
-BEFORE RELEASE
---------------
-- add sysup and fsearch to doc and man pages, help screen
-- update prog bash compl.
-
-REVIEW:
-- Attention: for a subdir /home/jw/build/kde in prtdir /home/jw/build,
-  you will see a port kde :-( Check for Pkgfile! FIXED: review; might be
-  a performance problem
-
+[ ] --quiet mode; suppress output of pkgmk and pkgadd
 [ ] prt-get rm and cd
 [ ] create a install-info file with all packages installed to allow a
     quick uninstall of those packages
-[ ] prt-get uninstall
 [ ] interrupt handler (ctrl-c) kill pkgmk/pkgadd, delete lock files, say
     "prt-get: action cancelled"; warn when cancel during download ->
     STATE variable, separate download and build.

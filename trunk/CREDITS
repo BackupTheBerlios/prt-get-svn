@@ -9,5 +9,8 @@ Thanks go to the following persons for valuable feedback/bug reports:
     * Sven Dahl
     * Matt Housh
 
+The following persons have contributed patches to prt-get:
+    * Logan Ingalls
+
 Not to forget debian for the inspiration for a *-get tool and the those
 on the crux mailing list writing about their ideas and needs.

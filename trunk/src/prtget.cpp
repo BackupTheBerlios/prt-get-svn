@@ -131,10 +131,12 @@ void PrtGet::printUsage()
     cout << "  fsearch <pattern>  show file names in footprints matching "
          << "'pattern'" << endl;
 
-    cout << "\nINSTALL AND UPDATE" << endl;
+    cout << "\nINSTALL, UPDATE and REMOVAL" << endl;
     cout << "  install [opt] <port1 port2...>    install ports" << endl;
     cout << "  update  [opt] <port1 port2...>    update ports" << endl;
     cout << "  grpinst [opt] <port1 port2...>    install ports, stop on error"
+         << endl;
+    cout << "  remove [opt] <port1 port2...>    remove ports"
          << endl;
     cout << "          where opt can be:" << endl;
     cout << "                --margs=<string>    pass 'string' to pkgmk"
@@ -1479,12 +1481,16 @@ void PrtGet::remove()
     list<string> failed;
     list<string> notInstalled;
 
+    if ( m_parser->isTest() ) {
+        cout << "*** " << m_appName << ": test mode" << endl;
+    }
+    
     const list<char*>& args = m_parser->otherArgs();
     list<char*>::const_iterator it = args.begin();
     for ( ; it != args.end(); ++it ) {
         if (m_pkgDB.isInstalled(*it)) {
             Process proc("pkgrm", *it);
-            if (proc.executeShell() == 0) {
+            if (m_parser->isTest() || proc.executeShell() == 0) {
                 removed.push_back(*it);
             } else {
                 failed.push_back(*it);
@@ -1523,6 +1529,11 @@ void PrtGet::remove()
             cout << *it << endl;
         }
     }
+    
+    if ( m_parser->isTest() ) {
+        cout << "*** " << m_appName << ": test mode end" << endl;
+    }
+
 
 
 }

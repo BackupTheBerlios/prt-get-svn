@@ -151,7 +151,7 @@ int Process::exec(const int argc, char** argv)
 int Process::executeShell()
 {
     // TODO: make shell exchangable
-    static const char SHELL[] = "/bin/bash";
+    static const char SHELL[] = "/bin/sh";
     int status = 0;
     if ( m_fdlog > 0 ) {
         status = execShellLog(SHELL);

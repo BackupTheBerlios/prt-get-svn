@@ -38,7 +38,9 @@ public:
              const string& url,
              const string& packager,
              const string& maintainer,
-             const string& hasReadme );
+             const string& hasReadme,
+             const string& hasPreInstall,
+             const string& hasPostInstall );
 
     ~Package();
 
@@ -52,6 +54,8 @@ public:
     const string& packager() const;
     const string& maintainer() const;
     const bool hasReadme() const;
+    const bool hasPreInstall() const;
+    const bool hasPostInstall() const;
 
 
 private:
@@ -73,7 +77,9 @@ struct PackageData
                  const string& url_="",
                  const string& packager="",
                  const string& maintainer="",
-                 const string& hasReadme_="" );
+                 const string& hasReadme_="",
+                 const string& hasPreInstall_="",
+                 const string& hasPostInstall_="");
 
     string name;
     string path;
@@ -86,6 +92,8 @@ struct PackageData
     string maintainer;
 
     bool hasReadme;
+    bool hasPreInstall;
+    bool hasPostInstall;
 };
 
 #endif /* _PACKAGE_H_ */

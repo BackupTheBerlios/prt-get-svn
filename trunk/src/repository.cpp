@@ -28,7 +28,7 @@ using namespace std;
 using namespace StringHelper;
 
 
-string Repository::CACHE_VERSION = "V4";
+string Repository::CACHE_VERSION = "V5";
 
 /*!
   Create a repository
@@ -130,12 +130,12 @@ void Repository::initFromFS( const list< pair<string, string> >& rootList,
     DIR* d;
     struct dirent* de;
     string name;
-    
+
     std::map<string, bool> alreadyChecked;
 
 
     for ( ; it != rootList.end(); ++it ) {
-            
+
         string path = it->first;
         string pkgInput = stripWhiteSpace( it->second );
 
@@ -240,7 +240,8 @@ Repository::initFromCache( const string& cacheFile )
     // name, path, version, release,
     // description, dependencies, url,
     // packager, maintainer, hasReadme;
-    const int fieldCount = 10;
+    // hasPreInstall, hasPostInstall
+    const int fieldCount = 12;
     string fields[fieldCount];
     int fieldPos = 0;
 
@@ -254,7 +255,8 @@ Repository::initFromCache( const string& cacheFile )
             Package* p = new Package( fields[0], fields[1],
                                       fields[2], fields[3],
                                       fields[4], fields[5], fields[6],
-                                      fields[7], fields[8], fields[9] );
+                                      fields[7], fields[8], fields[9],
+                                      fields[10], fields[11]);
             m_packageMap[p->name()] = p;
             fgets( input, length, fp ); // read empty line
         }
@@ -290,6 +292,8 @@ Repository::WriteResult Repository::writeCache( const string& cacheFile )
     char yesStr[] = "yes";
     char noStr[] = "no";
     char* hasReadme;
+    char* hasPreInstall;
+    char* hasPostInstall;
 
     // write version
     fprintf( fp, "%s\n", CACHE_VERSION.c_str() );
@@ -298,13 +302,22 @@ Repository::WriteResult Repository::writeCache( const string& cacheFile )
         const Package* p = it->second;
 
         // TODO: encode
-
         hasReadme = noStr;
         if ( p->hasReadme() ) {
             hasReadme = yesStr;
         }
+        
+        hasPreInstall = noStr;
+        if ( p->hasPreInstall() ) {
+            hasPreInstall = yesStr;
+        }
+        
+        hasPostInstall = noStr;
+        if ( p->hasPostInstall() ) {
+            hasPostInstall = yesStr;
+        }
 
-        fprintf( fp, "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n",
+        fprintf( fp, "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n",
                  p->name().c_str(),
                  p->path().c_str(),
                  p->version().c_str(),
@@ -315,7 +328,7 @@ Repository::WriteResult Repository::writeCache( const string& cacheFile )
                  p->url().c_str(),
                  p->packager().c_str(),
                  p->maintainer().c_str(),
-                 hasReadme );
+                 hasReadme, hasPreInstall, hasPostInstall );
     }
 
     fclose( fp );

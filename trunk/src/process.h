@@ -21,6 +21,7 @@ using namespace std;
   \brief Process execution class
 
   A class to execute processes
+  
 */
 class Process
 {
@@ -30,6 +31,13 @@ public:
     int executeShell();
 
 private:
+    
+    int exec(const int argc, char** argv);
+    int execLog(const int argc, char** argv);
+    
+    int execShell(const char* shell);
+    int execShellLog(const char* shell);
+    
     string m_app;
     string m_arguments;
     int m_fdlog;

@@ -305,8 +305,22 @@ void PrtGet::printInfo()
             cout << "Dependencies: " << p->dependencies() << endl;
         }
 
+        // TODO: don't hardcode file names
+        string filesString = "";
         if ( p->hasReadme() ) {
-            cout << "Readme:       " << "yes" << endl;
+            filesString += "README ";
+        }
+        if ( p->hasPreInstall() ) {
+            filesString += "pre-install ";
+        }
+        if ( p->hasPostInstall() ) {
+            filesString += "post-install ";
+        }
+        
+        if ( filesString.length() > 0 ) {
+            filesString = StringHelper::stripWhiteSpace( filesString );
+            StringHelper::replaceAll( filesString, " ", "," );
+            cout << "Files:        " << filesString << endl;
         }
 
     } else {
@@ -457,16 +471,16 @@ void PrtGet::install( bool update, bool group, bool dependencies )
             }
         }
     }
-    
+
     initRepo();
 
     if (dependencies) {
         // calc dependencies
         InstallTransaction depTransaction( m_parser->otherArgs(),
                                            m_repo, m_pkgDB, m_config );
-        InstallTransaction::InstallResult result = 
+        InstallTransaction::InstallResult result =
             depTransaction.calcDependencies();
-    
+
         // TODO: code duplication with printDepends!
         if ( result == InstallTransaction::CYCLIC_DEPEND ) {
             cerr << "prt-get: cyclic dependencies found" << endl;
@@ -479,14 +493,14 @@ void PrtGet::install( bool update, bool group, bool dependencies )
         }
         const list<string>& depRef = depTransaction.dependencies();
         list<string>::const_iterator it = depRef.begin();
-        
+
         list<string> deps;
         for (; it != depRef.end(); ++it) {
             if (!m_pkgDB.isInstalled(*it)) {
                 deps.push_back(*it);
             }
         }
-        
+
         InstallTransaction transaction( deps, m_repo, m_pkgDB, m_config );
         executeTransaction( transaction, update, group );
     } else {
@@ -806,7 +820,7 @@ void PrtGet::evaluateResult( InstallTransaction& transaction,
         ++errors;
         cout << endl << "-- Packages not found" << endl;
         list< pair<string, string> >::const_iterator mit = missing.begin();
-        
+
         for ( ; mit != missing.end(); ++mit ) {
             cout << mit->first;
             if ( mit->second != "" ) {
@@ -1059,19 +1073,21 @@ void PrtGet::printf()
         StringHelper::replaceAll( output, "%i", isInst );
         StringHelper::replaceAll( sortkey, "%i", isInst );
 
-        string isLocked = "no";
-        if ( m_locker.isLocked( p->name() ) ) {
-            isLocked = "yes";
-        }
+        string isLocked = m_locker.isLocked( p->name() ) ? "yes" : "no";
         StringHelper::replaceAll( output, "%l", isLocked );
         StringHelper::replaceAll( sortkey, "%l", isLocked );
 
-        string hasReadme = "no";
-        if ( p->hasReadme() ) {
-            hasReadme = "yes";
-        }
+        string hasReadme = p->hasReadme() ? "yes" : "no";
         StringHelper::replaceAll( output, "%R", hasReadme );
         StringHelper::replaceAll( sortkey, "%R", hasReadme );
+
+        string hasPreInstall = p->hasPreInstall() ? "yes" : "no";
+        StringHelper::replaceAll( output, "%E", hasPreInstall );
+        StringHelper::replaceAll( sortkey, "%E", hasPreInstall );
+
+        string hasPostInstall = p->hasPostInstall() ? "yes" : "no";
+        StringHelper::replaceAll( output, "%O", hasPostInstall );
+        StringHelper::replaceAll( sortkey, "%O", hasPostInstall );
 
         sortedOutput[sortkey] = output;
     }
@@ -1287,7 +1303,7 @@ SignalHandler::HandlerResult PrtGet::handleSignal( int signal )
 void PrtGet::fsearch()
 {
     assertMinArgCount(1);
-   
+
     string arg = "*";
     if ( m_parser->otherArgs().size() == 1 ) {
         arg = *(m_parser->otherArgs().begin());
@@ -1436,7 +1452,7 @@ void PrtGet::edit()
 void PrtGet::ls()
 {
     assertExactArgCount(1);
-    
+
     initRepo();
 
     list<char*>::const_iterator it = m_parser->otherArgs().begin();
@@ -1566,8 +1582,8 @@ void PrtGet::remove()
 void PrtGet::assertMaxArgCount(int count)
 {
     if ( m_parser->otherArgs().size() > 1 ) {
-        cerr << m_appName << " " 
-             << m_parser->commandName() << " takes at most " 
+        cerr << m_appName << " "
+             << m_parser->commandName() << " takes at most "
              << count << (count > 1 ? " arguments" : " argument") << endl;
         exit(PG_ARG_ERROR);
     }
@@ -1576,7 +1592,7 @@ void PrtGet::assertMaxArgCount(int count)
 void PrtGet::assertExactArgCount(int count)
 {
     if ( m_parser->otherArgs().size() != count ) {
-        cerr << m_appName << " " 
+        cerr << m_appName << " "
              << m_parser->commandName() << " takes exactly "
              << count << (count > 1 ? " arguments" : " argument") << endl;
         exit(PG_ARG_ERROR);
@@ -1586,9 +1602,9 @@ void PrtGet::assertExactArgCount(int count)
 void PrtGet::assertMinArgCount(int count)
 {
      if ( m_parser->otherArgs().size() < count ) {
-        cerr << m_appName 
+        cerr << m_appName
              << m_parser->commandName() << "takes at least "
              << count << (count > 1 ? " arguments" : " argument") << endl;
         exit(PG_ARG_ERROR);
-     }   
+     }
 }

@@ -65,7 +65,104 @@ int Process::execute()
     ++i;
     assert( i+1 == argc );
     argv[i] = NULL;
+    int status = 0;
+    
+    if ( m_fdlog > 0 ) {
+        status = execLog(argc, argv);
+    } else {
+        status = exec(argc, argv);
+    }
+    delete [] argv;
+    
+    return status;
+}
 
+
+int Process::execLog(const int argc, char** argv)
+{
+    int status = 0;
+    int fdpipe[2];
+    pipe( fdpipe );
+
+    pid_t pid = fork();
+    if ( pid == 0 ) {
+        // child process
+        close( fdpipe[0] );
+	dup2( fdpipe[1], 1 );
+	dup2( fdpipe[1], 2 );
+
+        execv( m_app.c_str(), argv );
+        _exit( EXIT_FAILURE );
+    } else if ( pid < 0 ) {
+        // fork failed
+        status = -1;
+    } else {
+        // parent process
+        close( fdpipe[1] );
+
+	char readbuf[1024];
+	int bytes, wpval;
+
+	while ( (wpval = waitpid ( pid, &status, WNOHANG )) == 0 ) {
+	    while ( (bytes=read(fdpipe[0], readbuf, sizeof(readbuf)-1)) > 0 ) {
+	        readbuf[bytes] = 0;
+		printf("%s", readbuf);
+                write( m_fdlog, readbuf, bytes );
+	    }
+	}
+
+        if ( wpval != pid ) {
+            status = -1;
+        }
+    }
+        
+    return status;
+}
+
+
+int Process::exec(const int argc, char** argv)
+{
+    int status = 0;
+    pid_t pid = fork();
+    if ( pid == 0 ) {
+        // child process
+        execv( m_app.c_str(), argv );
+        _exit( EXIT_FAILURE );
+    } else if ( pid < 0 ) {
+        // fork failed
+        status = -1;
+    } else {
+        // parent process
+        if ( waitpid ( pid, &status, 0 ) != pid ) {
+            status = -1;
+        }
+    }
+    return status;
+}
+
+/*!
+  execute the process using the shell
+  \return the exit status of the application
+
+  \todo make shell exchangable
+*/
+int Process::executeShell() 
+{
+    // TODO: make shell exchangable
+    static const char SHELL[] = "/bin/bash";
+    int status = 0;
+    if ( m_fdlog > 0 ) {
+        status = execShellLog(SHELL);
+    } else {
+        status = execShell(SHELL);
+    }
+    
+    return status;
+}
+
+
+int Process::execShellLog(const char* SHELL)
+{
     int status = 0;
 
     int fdpipe[2];
@@ -78,7 +175,7 @@ int Process::execute()
 	dup2( fdpipe[1], 1 );
 	dup2( fdpipe[1], 2 );
 
-        execv( m_app.c_str(), argv );
+        execl( SHELL, SHELL, "-c", (m_app + " " + m_arguments).c_str(), NULL );
         _exit( EXIT_FAILURE );
     } else if ( pid < 0 ) {
         // fork failed
@@ -109,28 +206,12 @@ int Process::execute()
     return status;
 }
 
-/*!
-  execute the process using the shell
-  \return the exit status of the application
-
-  \todo make shell exchangable
-*/
-int Process::executeShell()
+int Process::execShell(const char* SHELL)
 {
-    // TODO: make shell exchangable
-    static const char SHELL[] = "/bin/bash";
     int status = 0;
-
-    int fdpipe[2];
-    pipe( fdpipe );
 
     pid_t pid = fork();
     if ( pid == 0 ) {
-        // child process
-        close( fdpipe[0] );
-	dup2( fdpipe[1], 1 );
-	dup2( fdpipe[1], 2 );
-
         execl( SHELL, SHELL, "-c", (m_app + " " + m_arguments).c_str(), NULL );
         _exit( EXIT_FAILURE );
     } else if ( pid < 0 ) {
@@ -138,25 +219,7 @@ int Process::executeShell()
         status = -1;
     } else {
         // parent process
-        close( fdpipe[1] );
-
-	char readbuf[1024];
-	int bytes, wpval;
-
-	// printf( "%d\n", m_fdlog );
-
-	while ( (wpval = waitpid ( pid, &status, WNOHANG )) == 0 ) {
-	    while ( (bytes=read(fdpipe[0], readbuf, sizeof(readbuf)-1)) > 0 ) {
-	        readbuf[bytes] = 0;
-		printf("%s", readbuf);
-
-		if ( m_fdlog > 0 ) {
-		    write( m_fdlog, readbuf, bytes );
-		}
-	    }
-	}
-
-        if ( wpval != pid ) {
+        if ( waitpid ( pid, &status, 0 ) != pid ) {
             status = -1;
         }
     }

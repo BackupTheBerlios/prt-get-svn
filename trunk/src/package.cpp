@@ -45,12 +45,15 @@ Package::Package( const string& name,
                   const string& url,
                   const string& packager,
                   const string& maintainer,
-                  const string& hasReadme )
+                  const string& hasReadme,
+                  const string& hasPreInstall,
+                  const string& hasPostInstall)
     : m_loaded( true )
 {
     m_data = new PackageData( name, path, version, release,
                               description, dependencies, url,
-                              packager, maintainer, hasReadme );
+                              packager, maintainer, hasReadme, 
+                              hasPreInstall, hasPostInstall );
 
 }
 
@@ -126,6 +129,15 @@ const bool Package::hasReadme() const
     return m_data->hasReadme;
 }
 
+const bool Package::hasPreInstall() const
+{
+    return m_data->hasPreInstall;
+}
+
+const bool Package::hasPostInstall() const
+{
+    return m_data->hasPostInstall;    
+}
 
 /*!
   load from Pkgfile
@@ -215,6 +227,14 @@ void Package::load() const
     struct stat buf;
     if ( stat( file.c_str(), &buf ) != -1) {
         m_data->hasReadme = true;
+    }    
+    file = m_data->path + "/" + m_data->name + "/pre-install";
+    if ( stat( file.c_str(), &buf ) != -1) {
+        m_data->hasPreInstall = true;
+    }
+    file = m_data->path + "/" + m_data->name + "/post-install";
+    if ( stat( file.c_str(), &buf ) != -1) {
+        m_data->hasPostInstall = true;
     }
 
 }
@@ -231,7 +251,9 @@ PackageData::PackageData( const string& name_,
                           const string& url_,
                           const string& packager_,
                           const string& maintainer_,
-                          const string& hasReadme_ )
+                          const string& hasReadme_,
+                          const string& hasPreInstall_,
+                          const string& hasPostInstall_ )
     : name( name_ ),
       path( path_ ),
       version( version_ ),
@@ -244,5 +266,8 @@ PackageData::PackageData( const string& name_,
 
 {
     hasReadme = ( stripWhiteSpace( hasReadme_ ) == "yes" );
+    hasPreInstall = ( stripWhiteSpace( hasPreInstall_ ) == "yes" );
+    hasPostInstall = ( stripWhiteSpace( hasPostInstall_ ) == "yes" );
 }
+
 

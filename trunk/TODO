@@ -1,14 +1,24 @@
 0.6.0:
-- Actions
+- Actions/Commands
+  - Help per command
 - Dynamic command binding
 - common check for minArgs maxArgs exactArgs
 - abstract core and client (e.g. install and installtransaction)
 - Make InstallTransaction a real install transaction:
   - rollback pre-install if package building failed
+  - needs heavy refactoring to be easier to understand/maintain
+- Test mode: global (is duplicated right now)
+- remove should be in a transaction as well
+  - remove transaction
+  - install transaction
+  - etc.
+  - Transaction handler
+
 
 0.5.2:
-- doc remove
-- doc --pre-install --post-install --install-scripts
+- update man page
+- update manual
+- update completion
 
 BEFORE RELEASE
 --------------

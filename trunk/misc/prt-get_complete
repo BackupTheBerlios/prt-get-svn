@@ -48,7 +48,7 @@ _prt-get()
 			    fi
                         fi
 			    ;;
-                    "current"|"lock")
+                    "current"|"lock"|"remove")
                             plist=`prt-get listinst`
                             COMPREPLY=( $( compgen -W '$plist' $cur ) )
                             ;;
@@ -65,6 +65,11 @@ _prt-get()
                 case ${COMP_WORDS[1]} in
                     "install" | "update" | "groupinst")
                         COMPREPLY=( $( compgen -W  '--config= --cache \
+                                                    --pre-install \
+                                                    --post-install \
+                                                    --install-scripts \
+                                                    --log --test \
+                                                    --config \
                                                     --aargs= --margs=' \
                                                      -- $cur ) )
                         ;;

@@ -114,6 +114,8 @@ protected:
     void expandWildcardsRepo( const list<char*>& in,
                               list<string>& target );
 
+    void warnPackageNotFound(InstallTransaction& transaction);
+        
     Repository* m_repo;
     PkgDB* m_pkgDB;
     Configuration* m_config;

@@ -349,16 +349,14 @@ bool InstallTransaction::calculateDependencies()
     if ( m_packages.empty() ) {
         return false;
     }
-
+    
     list< pair<string, const Package*> >::const_iterator it =
         m_packages.begin();
     for ( ; it != m_packages.end(); ++it ) {
         const Package* package = it->second;
-        if ( package == NULL ) {
-            m_missingPackages.push_back( make_pair( it->first, string("") ) );
-            continue;
+        if ( package ) {
+            checkDependecies( package );
         }
-        checkDependecies( package );
     }
     list<int> indexList;
     if ( ! m_resolver.resolve( indexList ) ) {
@@ -494,6 +492,9 @@ InstallTransaction::calcDependencies( )
     for ( ; it != m_packages.end(); ++it ) {
         if ( it->second ) {
             validPackages = true;
+        } else {
+            // Note: moved here from calculateDependencies
+            m_missingPackages.push_back( make_pair( it->first, string("") ) );
         }
     }
     if ( !validPackages ) {

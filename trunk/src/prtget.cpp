@@ -565,7 +565,7 @@ void PrtGet::install( bool update, bool group, bool dependencies )
             m_returnValue = PG_GENERAL_ERROR;
             return;
         } else if ( result == InstallTransaction::PACKAGE_NOT_FOUND ) {
-            cerr << "prt-get: One or more packages could not be found" << endl;
+            warnPackageNotFound(depTransaction);
             m_returnValue = PG_GENERAL_ERROR;
             return;
         }
@@ -678,7 +678,7 @@ void PrtGet::printDepends( bool simpleListing )
         m_returnValue = PG_GENERAL_ERROR;
         return;
     } else if ( result == InstallTransaction::PACKAGE_NOT_FOUND ) {
-        cerr << "prt-get: One or more packages could not be found" << endl;
+        warnPackageNotFound(transaction);        
         m_returnValue = PG_GENERAL_ERROR;
         return;
     }
@@ -1249,6 +1249,13 @@ void PrtGet::printDependendent()
     }
 }
 
+void PrtGet::warnPackageNotFound(InstallTransaction& transaction)
+{
+    cerr << "The following package could not be found: ";
+    cerr << transaction.missing().begin()->first;
+    cerr << endl;
+}
+
 void PrtGet::sysup()
 {
     // TODO: refactor getDifferentPackages from diff/quickdiff
@@ -1292,7 +1299,7 @@ void PrtGet::sysup()
             m_returnValue = PG_GENERAL_ERROR;
             return;
         } else if ( result == InstallTransaction::PACKAGE_NOT_FOUND ) {
-            cerr << "One or more packages could not be found" << endl;
+            warnPackageNotFound(depTrans);
             m_returnValue = PG_GENERAL_ERROR;
             return;
         }

@@ -18,7 +18,7 @@ functionality to crux' package management system. It works with the
 local ports tree and is therefore fully compatible with ports(8) and
 pkgmk(8)/pkgadd(8). It offers the following features:
 
-.PP 
+.PP
 .TP 
 \ \ \ \(bu
 abstract ports installation/update from file system
@@ -62,6 +62,10 @@ prt\-get has a test mode so you can see what effect an install/update
 operation would have. Use the \-\-test switch for this (see also:
 OPTIONS)
 
+.SH "RETURN VALUE"
+prt\-get returns 0 on success and a non-zero value otherwise (exact
+value -> meaning mapping to be determined...)
+
 .SH "COMMANDS"
 prt\-get uses so called commands, which always have to be the first 
 argument passed. This is very similar to
@@ -73,6 +77,11 @@ argument passed. This is very similar to
 .B install [\-\-margs] [\-\-aargs] [\-\-log]] <package1> [<package2> ...]
 install all packages in the listed order. Note that you can do this
 from any directory
+
+.TP 
+.B depinst [\-\-margs] [\-\-aargs] [\-\-log]] <package1> [<package2> ...]
+install all packages in the listed order including their dependencies.
+Note that outdated packages won't be updated.
 
 .TP 
 .B grpinst [\-\-margs] [\-\-aargs]  [\-\-log] <package1> [<package2> ...]

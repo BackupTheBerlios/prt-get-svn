@@ -14,7 +14,6 @@
 
 class Repository;
 class ArgParser;
-class InstallTransaction;
 class Configuration;
 
 #include <list>
@@ -25,6 +24,7 @@ using namespace std;
 #include "pkgdb.h"
 #include "signaldispatcher.h"
 #include "locker.h"
+#include "installtransaction.h"
 
 /*!
   \class PrtGet
@@ -88,6 +88,7 @@ protected:
     void printResult( InstallTransaction& transaction,
                       bool update,
                       bool interrupted=false );
+    void reportPrePost(const InstallTransaction::InstallInfo& info);
 
     void readConfig();
     void initRepo( bool listDuplicate=false );

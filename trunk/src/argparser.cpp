@@ -34,7 +34,9 @@ ArgParser::ArgParser( int argc, char** argv )
       m_writeLog( false ),
       m_hasFilter( false ),
       m_nodeps( false ),
-      m_all( false )
+      m_all( false ),
+      m_execPreInstall( false ),
+      m_execPostInstall( false )
 {
 }
 
@@ -176,6 +178,13 @@ bool ArgParser::parse()
                     m_all = true;
                 } else if ( s == "--log" ) {
                     m_writeLog = true;
+                } else if ( s == "--pre-install" ) {
+                    m_execPreInstall = true;
+                } else if ( s == "--post-install" ) {
+                    m_execPostInstall = true;
+                } else if ( s == "--install-scripts" ) {
+                    m_execPreInstall = true;
+                    m_execPostInstall = true;
                 }
 
                 // substrings
@@ -307,4 +316,14 @@ const string& ArgParser::commandName() const
 const string& ArgParser::unknownOption() const
 {
     return m_unknownOption;
+}
+
+bool ArgParser::execPreInstall() const
+{
+    return m_execPreInstall;
+}
+
+bool ArgParser::execPostInstall() const
+{
+    return m_execPostInstall;
 }

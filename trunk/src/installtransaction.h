@@ -60,12 +60,12 @@ public:
     };
     
     enum State {
-        EXECUTED,
+        EXEC_SUCCESS,
         FAILED,
         NONEXISTENT
     };
-    struct ScriptState {
-        ScriptState(bool hasReadme_) {
+    struct InstallInfo {
+        InstallInfo(bool hasReadme_) {
             hasReadme = hasReadme_;
             preState = NONEXISTENT;
             postState = NONEXISTENT;
@@ -80,14 +80,13 @@ public:
                            bool group );
     InstallResult  calcDependencies();
 
-    const list< pair<string, ScriptState> >& installedPackages() const;
-    const map<string, ScriptState>& scriptStates() const;
+    const list< pair<string, InstallInfo> >& installedPackages() const;
     const list<string>& alreadyInstalledPackages() const;
 
 
     const list<string>& dependencies() const;
     const list< pair<string,string> >& missing() const;
-    const list<string>& installError() const;
+    const list< pair<string, InstallInfo> >& installError() const;
 
 private:
     bool calculateDependencies();
@@ -95,7 +94,8 @@ private:
 
     InstallResult installPackage( const Package* package,
                                   const ArgParser* parser,
-                                  bool update ) const;
+                                  bool update,
+                                  InstallInfo& info ) const;
 
     static string getPkgDest();
 
@@ -110,7 +110,7 @@ private:
     bool m_depCalced;
 
     // packages< pair<name, hasReadme> > installed by this transaction
-    list< pair<string, ScriptState> > m_installedPackages;
+    list< pair<string, InstallInfo> > m_installedPackages;
 
     // packages which were requested to be installed which where already
     list<string> m_alreadyInstalledPackages;
@@ -122,7 +122,7 @@ private:
     list< pair<string, string> > m_missingPackages;
 
     // packages where build/installed failed
-    list<string> m_installErrors;
+    list< pair<string, InstallInfo> > m_installErrors;
 
     /// prt-get itself
     const Configuration* m_config;

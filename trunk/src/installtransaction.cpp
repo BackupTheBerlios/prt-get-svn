@@ -82,7 +82,8 @@ InstallTransaction::InstallTransaction( const list<string>& names,
 /*!
   \return packages where building/installation failed
 */
-const list<string>& InstallTransaction::installError() const
+const list< pair<string, InstallTransaction::InstallInfo> >& 
+InstallTransaction::installError() const
 {
     return m_installErrors;
 }
@@ -120,11 +121,11 @@ InstallTransaction::install( const ArgParser* parser,
         }
 
         InstallTransaction::InstallResult result;
+        InstallInfo info( package->hasReadme() );
         if ( parser->isTest() ||
-             (result = installPackage( package, parser ,update )) == SUCCESS) {
+             (result = installPackage( package, parser, update, info )) == SUCCESS) {
             
-            ScriptState state( package->hasReadme() );
-            m_installedPackages.push_back( make_pair( package->name(), state));
+            m_installedPackages.push_back( make_pair( package->name(), info));
         } else {
 
             // log failures are critical
@@ -138,7 +139,7 @@ InstallTransaction::install( const ArgParser* parser,
                 return result;
             }
 
-            m_installErrors.push_back( package->name() );
+            m_installErrors.push_back( make_pair(package->name(), info) );
             if ( group ) {
                 return PKGMK_FAILURE;
             }
@@ -154,11 +155,14 @@ InstallTransaction::install( const ArgParser* parser,
   \param package the package to be installed
   \param parser the argument parser to be used
   \param update whether this is an update transaction
+  \param info store pre and post install information
 */
 InstallTransaction::InstallResult
 InstallTransaction::installPackage( const Package* package,
                                     const ArgParser* parser,
-                                    bool update ) const
+                                    bool update,
+                                    InstallTransaction::InstallInfo& info ) 
+    const
 {
 
     InstallTransaction::InstallResult result = SUCCESS;
@@ -216,6 +220,18 @@ InstallTransaction::installPackage( const Package* package,
     string pkgdir = package->path() + "/" + package->name();
     chdir( pkgdir.c_str() );
 
+    // -- pre-install
+    struct stat statData;
+    if (parser->execPreInstall() &&
+        stat((pkgdir + "/" + "pre-install").c_str(), &statData) == 0) {
+        Process preProc( "sh", pkgdir + "/" + "pre-install" );
+        if (preProc.executeShell()) {
+            info.preState = FAILED;   
+        } else {
+            info.preState = EXEC_SUCCESS;
+        }
+    }
+    
     // -- build
     string cmd = "pkgmk";
     string args = "-d " + parser->pkgmkArgs();
@@ -257,6 +273,18 @@ InstallTransaction::installPackage( const Package* package,
             Process installProc( cmd, args );
             if ( installProc.executeShell() ) {
                 result = PKGADD_FAILURE;
+            } else {
+                // exec post install
+                if (parser->execPostInstall() &&
+                    stat((pkgdir + "/" + "post-install").c_str(), &statData) 
+                    == 0) {
+                    Process postProc( "sh", pkgdir + "/" + "post-install" );
+                    if (postProc.executeShell()) {
+                        info.postState = FAILED;   
+                    } else {
+                        info.postState = EXEC_SUCCESS;
+                    }
+                }
             }
         }
     }
@@ -413,7 +441,7 @@ const list<string>& InstallTransaction::alreadyInstalledPackages() const
 /*!
   \return the packages which were installed in this transaction
 */
-const list< pair<string, InstallTransaction::ScriptState> >& 
+const list< pair<string, InstallTransaction::InstallInfo> >& 
 InstallTransaction::installedPackages() const
 {
     return m_installedPackages;

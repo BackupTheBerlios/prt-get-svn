@@ -773,15 +773,19 @@ void PrtGet::printResult( InstallTransaction& transaction,
         }
     }
 
-    const list<string>& error = transaction.installError();
+    const list< pair<string, InstallTransaction::InstallInfo> >& error = 
+        transaction.installError();
     if ( error.size() ) {
         ++errors;
         cout << endl << "-- Packages where "
              << command[0] << " failed" << endl;
-        list<string>::const_iterator eit = error.begin();
+        list< pair<string, InstallTransaction::InstallInfo> >::const_iterator 
+            eit = error.begin();
 
         for ( ; eit != error.end(); ++eit ) {
-            cout << *eit << endl;
+            cout << eit->first;
+            reportPrePost(eit->second);
+            cout << endl;
         }
     }
 
@@ -797,11 +801,11 @@ void PrtGet::printResult( InstallTransaction& transaction,
     }
     
     
-    const list< pair<string, InstallTransaction::ScriptState> >& inst = 
+    const list< pair<string, InstallTransaction::InstallInfo> >& inst = 
         transaction.installedPackages();
     if ( inst.size() ) {
         cout << endl << "-- Packages " << command[1] << endl;
-        list< pair<string, InstallTransaction::ScriptState> >::const_iterator 
+        list< pair<string, InstallTransaction::InstallInfo> >::const_iterator 
             iit = inst.begin();
 
         bool atLeastOnePackageHasReadme = false;
@@ -815,6 +819,7 @@ void PrtGet::printResult( InstallTransaction& transaction,
                 }
                 atLeastOnePackageHasReadme = true;
             }
+            reportPrePost(iit->second);
             cout << endl;
         }
 
@@ -841,6 +846,23 @@ void PrtGet::printResult( InstallTransaction& transaction,
     }
 }
 
+void PrtGet::reportPrePost(const InstallTransaction::InstallInfo& info) {
+    if (info.preState != InstallTransaction::NONEXISTENT) {
+        string preString = "failed";
+        if (info.preState == InstallTransaction::EXEC_SUCCESS) {
+            preString = "ok";
+        }   
+        cout << " [pre: " << preString << "]";
+    }
+    if ( info.postState != InstallTransaction::NONEXISTENT) {
+        string postString = "failed";
+        if (info.postState == InstallTransaction::EXEC_SUCCESS){
+            postString = "ok";
+        }   
+        cout << " [post: " << postString << "]";
+    }
+
+}
 
 /*! create a cache */
 void PrtGet::createCache()

@@ -48,12 +48,16 @@ public:
     bool hasFilter() const;
     bool nodeps() const;
     bool all() const;
+    bool execPreInstall() const;
+    bool execPostInstall() const;
 
     const string& alternateConfigFile() const;
     const string& pkgmkArgs() const;
     const string& pkgaddArgs() const;
     const string& sortArgs() const;
     const string& filter() const;
+
+    
 
     Type commandType() const;
 
@@ -79,6 +83,9 @@ private:
     bool m_nodeps;
 
     bool m_all;
+
+    bool m_execPreInstall;
+    bool m_execPostInstall;
 
     string m_alternateConfigFile;
     string m_pkgmkArgs;

@@ -2,6 +2,7 @@
 - introduce symbolic return values
 - code: introduce generic argument number checks
 - (re)introduce depinst command
+- fix problem with prt-get fsearch: symlink'ed files are found as well
 
 * 0.5.3p2       29.09.2003  Johannes Winkelmann
 - Fix little bug in prt-get printf: don't print out empty lines (even if

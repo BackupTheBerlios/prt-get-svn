@@ -66,14 +66,14 @@ int Process::execute()
     assert( i+1 == argc );
     argv[i] = NULL;
     int status = 0;
-    
+
     if ( m_fdlog > 0 ) {
         status = execLog(argc, argv);
     } else {
         status = exec(argc, argv);
     }
     delete [] argv;
-    
+
     return status;
 }
 
@@ -107,6 +107,8 @@ int Process::execLog(const int argc, char** argv)
 	    while ( (bytes=read(fdpipe[0], readbuf, sizeof(readbuf)-1)) > 0 ) {
 	        readbuf[bytes] = 0;
 		printf("%s", readbuf);
+                fflush(stdout);
+                fflush(stderr);
                 write( m_fdlog, readbuf, bytes );
 	    }
 	}
@@ -115,7 +117,7 @@ int Process::execLog(const int argc, char** argv)
             status = -1;
         }
     }
-        
+
     return status;
 }
 
@@ -146,7 +148,7 @@ int Process::exec(const int argc, char** argv)
 
   \todo make shell exchangable
 */
-int Process::executeShell() 
+int Process::executeShell()
 {
     // TODO: make shell exchangable
     static const char SHELL[] = "/bin/bash";
@@ -156,7 +158,7 @@ int Process::executeShell()
     } else {
         status = execShell(SHELL);
     }
-    
+
     return status;
 }
 
@@ -191,10 +193,9 @@ int Process::execShellLog(const char* SHELL)
 	    while ( (bytes=read(fdpipe[0], readbuf, sizeof(readbuf)-1)) > 0 ) {
 	        readbuf[bytes] = 0;
 		printf("%s", readbuf);
-
-		if ( m_fdlog > 0 ) {
-		    write( m_fdlog, readbuf, bytes );
-		}
+                fflush(stdout);
+                fflush(stderr);
+                write( m_fdlog, readbuf, bytes );
 	    }
 	}
 

@@ -8,8 +8,9 @@ Thanks go to the following persons for valuable feedback/bug reports:
     * Roger Kislig
     * Sven Dahl
     * Matt Housh
+    * Christoph Winkelmann
 
-The following persons have contributed patches to prt-get:
+The following persons have contributed patches to prt-get's source code:
     * Logan Ingalls
 
 Not to forget debian for the inspiration for a *-get tool and the those

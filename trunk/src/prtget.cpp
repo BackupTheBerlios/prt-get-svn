@@ -134,6 +134,8 @@ void PrtGet::printUsage()
          << endl;
     cout << "  quickdep  <port1 port2...>  same as 'depends' but simple format"
          << endl;
+    cout << "  deptree   <port>            show dependencies tree for <port>"
+         << endl;
     cout << "  dependent [opt] <port>      show installed packages which "
          << "depend on 'port'"
          << endl;
@@ -460,10 +462,10 @@ void PrtGet::isInstalled()
     for ( ; it != l.end(); ++it ) {
         bool isAlias = false;
         string aliasName;
-        
+
         if ( m_pkgDB->isInstalled( *it, true, &isAlias, &aliasName  ) ) {
             if (isAlias) {
-                cout << *it << " is provided by package " 
+                cout << *it << " is provided by package "
                      << aliasName
                      << endl;
             } else {
@@ -694,7 +696,7 @@ void PrtGet::printDepends( bool simpleListing )
         if ( deps.size() > 0 ) {
             cout << "-- dependencies ([i] = installed)" << endl;
             list<string>::const_iterator it = deps.begin();
-            
+
             bool isAlias;
             string provider;
             for ( ; it != deps.end(); ++it ) {
@@ -956,7 +958,7 @@ void PrtGet::evaluateResult( InstallTransaction& transaction,
             isAlias = false;
             cout << *ait;
             m_pkgDB->isInstalled(*ait, true, &isAlias, &provider);
-            
+
             if (isAlias) {
                 cout << " (provided by " << provider << ")";
             }

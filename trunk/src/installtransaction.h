@@ -41,6 +41,11 @@ public:
                         const Repository* repo,
                         PkgDB* pkgDB,
                         const Configuration* config );
+    
+    static const std::string PKGMK_DEFAULT_COMMAND;
+    static const std::string PKGADD_DEFAULT_COMMAND;
+    static const std::string PKGRM_DEFAULT_COMMAND;
+
 
     /*! Result of an installation */
     enum InstallResult {
@@ -126,6 +131,7 @@ private:
 
     /// prt-get itself
     const Configuration* m_config;
+    
 };
 
 #endif /* _INSTALLTRANSACTION_H_ */

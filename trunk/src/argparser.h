@@ -38,7 +38,7 @@ public:
                 CURRENT, FSEARCH, LOCK, UNLOCK, LISTLOCKED,
                 CAT, LS, EDIT, REMOVE,
                 DEPTREE, DUMPCONFIG };
-
+    
     bool isCommandGiven() const;
     bool isForced() const;
     bool isTest() const;

@@ -35,6 +35,12 @@ using namespace std;
 using namespace StringHelper;
 
 
+const string InstallTransaction::PKGMK_DEFAULT_COMMAND =  "/usr/bin/pkgmk";
+const string InstallTransaction::PKGADD_DEFAULT_COMMAND = "/usr/bin/pkgadd";
+const string InstallTransaction::PKGRM_DEFAULT_COMMAND =  "/usr/bin/pkgrm";
+
+
+
 /*!
  Create a nice InstallTransaction
  \param names a list of port names to be installed
@@ -233,7 +239,7 @@ InstallTransaction::installPackage( const Package* package,
     }
 
     // -- build
-    string cmd = "pkgmk";
+    string cmd = PKGMK_DEFAULT_COMMAND;
     if (m_config->makeCommand() != "") {
         cmd = m_config->makeCommand();
     }
@@ -260,7 +266,7 @@ InstallTransaction::installPackage( const Package* package,
         if ( chdir( pkgdir.c_str() ) != 0 ) {
             result = PKGDEST_ERROR;
         } else {
-            cmd = "pkgadd";
+            cmd = PKGADD_DEFAULT_COMMAND;
             if (m_config->addCommand() != "") {
                 cmd = m_config->addCommand();
             }

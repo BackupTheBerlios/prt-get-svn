@@ -1599,7 +1599,7 @@ void PrtGet::remove()
         cout << "*** " << m_appName << ": test mode" << endl;
     }
 
-    string command = "pkgrm";
+    string command = InstallTransaction::PKGRM_DEFAULT_COMMAND;
     if (m_config->removeCommand() != "") {
         command = m_config->removeCommand();
     }

@@ -204,6 +204,13 @@ Only list direct dependencies. Usually shows dependent packages which
 are installed. To see all dependencies, add the --all switch
 
 .TP 
+.B deptree <package>
+print a tree of the dependencies of the package
+.B package. 
+Subtrees already shown are marked with '-->' to save some space, in
+order to show them all, add the --all switch
+
+.TP 
 .B dup
 List ports which can be found in multiple directories configured in
 .B /etc/prt.get.conf

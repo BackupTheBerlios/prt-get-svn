@@ -19,7 +19,7 @@ _prt-get()
                     search dsearch fsearch printf cache \
                     dependent sysup current lock unlock \
                     listlocked diff quickdiff depends quickdep \
-                    dup isinst cat ls edit \
+                    dup isinst cat ls edit deptree \
                     remove listinst' $cur ))
         fi
 
@@ -29,7 +29,7 @@ _prt-get()
 	        case ${COMP_WORDS[1]} in
                     "install" | "depinst" | "grpinst"  | "path" | "dependent" | \
                     "depends" | "quickdep" | "info" | "readme" | \
-                    "ls" | "isinst" )
+                    "ls" | "isinst" | "deptree" )
     		 	    if [ -f /var/lib/pkg/prt-get.cache ]; then
                             	plist=`prt-cache list`
 				if [ ! "$plist" == "" ]; then

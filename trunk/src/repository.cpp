@@ -395,11 +395,14 @@ void Repository::addDependencies( std::map<string, string>& deps )
 {
     map<string, string>::iterator it = deps.begin();
     for ( ; it != deps.end(); ++it ) {
-        map<string, Package*>::const_iterator pit = 
+        map<string, Package*>::const_iterator pit =
             m_packageMap.find( it->first );
         if ( pit != m_packageMap.end() ) {
             Package* p = pit->second;
-            p->setDependencies(it->second);
+            if (p->dependencies().length() == 0) {
+                // only use if no dependencies in Pkgfile
+                p->setDependencies(it->second);
+            }
         }
     }
 }

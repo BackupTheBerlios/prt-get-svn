@@ -1,3 +1,6 @@
+* 0.5.5p1       23.03.2004  Johannes Winkelmann
+- Let Pkgfile's dependencies take precedence over deplist
+
 * 0.5.5		05.03.2004  Johannes Winkelmann
 - Add new configuration option: depfile
 - add way to use external dependency file

@@ -1,0 +1,100 @@
+0.6.0:
+- Actions/Commands
+  - Help per command
+- Dynamic command binding
+- common check for minArgs maxArgs exactArgs
+- abstract core and client (e.g. install and installtransaction)
+- Make InstallTransaction a real install transaction:
+  - rollback pre-install if package building failed
+  - needs heavy refactoring to be easier to understand/maintain
+- Test mode: global (is duplicated right now)
+- remove should be in a transaction as well
+  - remove transaction
+  - install transaction
+  - etc.
+  - Transaction handler
+
+
+0.5.2:
+- update manual
+
+BEFORE RELEASE
+--------------
+- add sysup and fsearch to doc and man pages, help screen
+- update prog bash compl.
+
+REVIEW:
+- Attention: for a subdir /home/jw/build/kde in prtdir /home/jw/build,
+  you will see a port kde :-( Check for Pkgfile! FIXED: review; might be
+  a performance problem
+
+[ ] prt-get rm and cd
+[ ] create a install-info file with all packages installed to allow a
+    quick uninstall of those packages
+[ ] prt-get uninstall
+[ ] interrupt handler (ctrl-c) kill pkgmk/pkgadd, delete lock files, say
+    "prt-get: action cancelled"; warn when cancel during download ->
+    STATE variable, separate download and build.
+[ ] lock files for log, cache (lock file class)
+[ ] cache file class, help class
+[ ] direct options for -im, -uf, -fr (force rebuild), -fi (force install)
+[ ] move command name out of execTransaction (would be wrong for e.g.
+    sysup)
+[ ] prt-get diff stats: "100 Packages with differences"
+
+
+SHORT TERM
+------------
+
+* XML manual: add chapter about programmable bash completion
+
+* Answer FAQs
+
+* create a fileExists(), createDir() etc helper class
+
+* questions
+  - should the install/update result include the version/release?
+
+* cosmetic
+  - move all output messages to prtget.cpp (away from main.cpp)
+  - remove "using namespace std" from header file
+
+* test
+  - add asserts
+
+* functional
+  - check exit messages (strings). always add 'prt-get'
+  - simple version handling to mark ports older in the repository than
+    installed (Done; disabled)
+  
+* refactor
+  - check operations in prtget.cpp for common code
+  - make InstallTransaction more modular (download/build/install)
+
+LONG TERM
+------------------------------
+* remove quickdiff
+* move find command into list --filter="..." ???
+
+* symbolic exit codes
+
+* new commands:
+
+* questions:
+  - should there be a install/update mixed to mode, to install and update,
+    which ever method is needed?
+  - namespace prtget ? 
+  - remove the path:package1, package2 filter functionality from the
+    config file again. This could be done by creating another ports
+    directories an creation symlinks there to. Could improve performance
+  - might people like ansi colors?
+
+* new features
+  - list shadow packages (dup) for arguments 
+
+
+LONG LONG TERM
+--------------
+- parallel download for installing/updating multiple packages (at least
+  download of 2nd package while building first)
+

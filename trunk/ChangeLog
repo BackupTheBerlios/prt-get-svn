@@ -1,7 +1,18 @@
-* 0.5.2         01.09.2003  Johannes Winkelmann
+* 0.5.3p2       29.09.2003  Johannes Winkelmann
+- Fix little bug in prt-get printf: don't print out empty lines (even if
+  there's a newline char)
+
+* 0.5.3p1       25.09.2003  Johannes Winkelmann
+- Adapt new patch naming
+- Be more clever when calling prt-get diff with a filter
+
+* 0.5.3         01.09.2003  Johannes Winkelmann
 - Add 'remove' feature
 - implement pre/post install execution
 - prt-get diff doesn't display locked; use --all if you want them
+- Fix bug in repository initialization when pkgdirs were specified twice
+
+* 0.5.2 not used ;-)
 
 * 0.5.1a	08.08.2003  Johannes Winkelmann
 - Fix for gcc 3.3

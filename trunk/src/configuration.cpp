@@ -176,7 +176,7 @@ void Configuration::parseLine(const string& line, bool prepend)
             m_runScripts = true;
         }
     } else if ( startwith_nocase( s, "preferhigher" ) ) {
-        s = stripWhiteSpace( s.replace( 0, 10, "" ) );
+        s = stripWhiteSpace( s.replace( 0, 12, "" ) );
         if ( s == "yes" ) {
             m_preferHigher = true;
         }

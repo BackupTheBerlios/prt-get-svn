@@ -1,3 +1,15 @@
+0.6.0:
+- Actions
+- Dynamic command binding
+- common check for minArgs maxArgs exactArgs
+- abstract core and client (e.g. install and installtransaction)
+- Make InstallTransaction a real install transaction:
+  - rollback pre-install if package building failed
+
+0.5.2:
+- doc remove
+- doc --pre-install --post-install --install-scripts
+
 BEFORE RELEASE
 --------------
 - add sysup and fsearch to doc and man pages, help screen

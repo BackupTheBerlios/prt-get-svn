@@ -142,7 +142,6 @@ void Repository::initFromFS( const list< pair<string, string> >& rootList,
         if ( alreadyChecked[path] ) {
             continue;
         }
-        alreadyChecked[path] = true;
 
         bool filter = false;
         if ( pkgInput.length() > 0 ) {
@@ -157,6 +156,10 @@ void Repository::initFromFS( const list< pair<string, string> >& rootList,
             while ( pkgInput.find( ",," ) != string::npos ) {
                 pkgInput = pkgInput.replace( pkgInput.find(",,"), 2, "," );
             }
+        }
+        
+        if (!filter) {
+            alreadyChecked[path] = true;
         }
 
         list<string> packages;
@@ -306,12 +309,12 @@ Repository::WriteResult Repository::writeCache( const string& cacheFile )
         if ( p->hasReadme() ) {
             hasReadme = yesStr;
         }
-        
+
         hasPreInstall = noStr;
         if ( p->hasPreInstall() ) {
             hasPreInstall = yesStr;
         }
-        
+
         hasPostInstall = noStr;
         if ( p->hasPostInstall() ) {
             hasPostInstall = yesStr;

@@ -1,3 +1,8 @@
+* 0.5.4         04.10.2003  Johannes Winkelmann
+- introduce symbolic return values
+- code: introduce generic argument number checks
+- (re)introduce depinst command
+
 * 0.5.3p2       29.09.2003  Johannes Winkelmann
 - Fix little bug in prt-get printf: don't print out empty lines (even if
   there's a newline char)

@@ -950,8 +950,17 @@ void PrtGet::evaluateResult( InstallTransaction& transaction,
              << endl;
         list<string>::const_iterator ait = already.begin();
 
+        bool isAlias;
+        string provider;
         for ( ; ait != already.end(); ++ait ) {
-            cout << *ait << endl;
+            isAlias = false;
+            cout << *ait;
+            m_pkgDB->isInstalled(*ait, true, &isAlias, &provider);
+            
+            if (isAlias) {
+                cout << " (provided by " << provider << ")";
+            }
+            cout << endl;
         }
     }
 
@@ -1616,7 +1625,6 @@ void PrtGet::remove()
             args += (m_parser->pkgrmArgs() + " " + *it);
 
             Process proc(command, args);
-            cout << "1" << command << " 2 " << args << endl;
             if (m_parser->isTest() || proc.executeShell() == 0) {
                 removed.push_back(*it);
             } else {

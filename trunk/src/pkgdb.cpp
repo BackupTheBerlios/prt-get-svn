@@ -54,7 +54,7 @@ bool PkgDB::isInstalled( const string& name,
     }
 
     bool installed = m_packages.find( name ) != m_packages.end();
-    if (!installed) {
+    if (!installed && useAlias) {
         string provider;
         installed = aliasExistsFor(name, provider);
 

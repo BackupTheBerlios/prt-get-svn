@@ -170,7 +170,7 @@ InstallTransaction::installPackage( const Package* package,
     LockFile lockFile;
 #endif
 
-    int fderr, fdout, tmperr, tmpout;
+    int fdlog = -1;
     if ( m_config->writeLog() ) {
         string logFile = m_config->logFilePattern();
         if ( logFile == "" ) {
@@ -179,6 +179,8 @@ InstallTransaction::installPackage( const Package* package,
 
         StringHelper::replaceAll( logFile, "%n", package->name() );
         StringHelper::replaceAll( logFile, "%p", package->path() );
+        StringHelper::replaceAll( logFile, "%v", package->version() );
+        StringHelper::replaceAll( logFile, "%r", package->release() );
 
 #ifdef USE_LOCKING
         lockFile.setFile( logFile );
@@ -199,22 +201,12 @@ InstallTransaction::installPackage( const Package* package,
             unlink( logFile.c_str() );
         }
 
-        fderr = open( logFile.c_str(),
-                          O_APPEND | O_WRONLY | O_CREAT, 0666 );
-        fdout = open( logFile.c_str(),
-                          O_APPEND | O_WRONLY | O_CREAT, 0666 );
+        fdlog = open( logFile.c_str(),
+		          O_APPEND | O_WRONLY | O_CREAT, 0666 );
 
-
-        if ( fderr == -1  || fdout == -1 ) {
+        if ( fdlog == -1 ) {
             return LOG_FILE_FAILURE;
         }
-
-
-        tmpout = dup( 1 );
-        tmperr = dup( 2 );
-
-        dup2( fdout, 1 );  // redirect stderr
-        dup2( fderr, 2 );  // redirect stdout
     }
 
     string pkgdir = package->path() + "/" + package->name();
@@ -224,7 +216,7 @@ InstallTransaction::installPackage( const Package* package,
     struct stat statData;
     if (parser->execPreInstall() &&
         stat((pkgdir + "/" + "pre-install").c_str(), &statData) == 0) {
-        Process preProc( "sh", pkgdir + "/" + "pre-install" );
+        Process preProc( "sh", pkgdir + "/" + "pre-install", fdlog );
         if (preProc.executeShell()) {
             info.preState = FAILED;
         } else {
@@ -235,7 +227,7 @@ InstallTransaction::installPackage( const Package* package,
     // -- build
     string cmd = "pkgmk";
     string args = "-d " + parser->pkgmkArgs();
-    Process makeProc( cmd, args );
+    Process makeProc( cmd, args, fdlog );
     if ( makeProc.executeShell() ) {
         result = PKGMK_FAILURE;
     } else {
@@ -244,7 +236,12 @@ InstallTransaction::installPackage( const Package* package,
         if ( pkgdest != "" ) {
             // TODO: don't manipulate pkgdir
             pkgdir = pkgdest;
-            cout << "Using PKGMK_PACKAGE_DIR: " << pkgdir << endl;
+            string message = "Using PKGMK_PACKAGE_DIR: " + pkgdir;
+            cout << message << endl;
+            if ( m_config->writeLog() ) {
+                write( fdlog, message.c_str(), message.length() );
+                write( fdlog, "\n", 1 );
+            }
         }
 
         // the following chdir is a noop if usePkgDest() returns false
@@ -269,21 +266,28 @@ InstallTransaction::installPackage( const Package* package,
             if ( parser->wasCalledAsPrtCached() ) {
                 commandName = "prt-cache";
             }
-            cout << commandName << ": " << cmd << " " << args << endl;
+            
+            string message = commandName + ": " + cmd + " " + args;
+            cout << message << endl;
+            if ( m_config->writeLog() ) {
+                write( fdlog, message.c_str(), message.length() );
+                write( fdlog, "\n", 1 );
+            }
 
-            Process installProc( cmd, args );
+            Process installProc( cmd, args, fdlog );
             if ( installProc.executeShell() ) {
                 result = PKGADD_FAILURE;
             } else {
                 // exec post install
                 if (parser->execPostInstall() &&
-                    stat((package->path() + "/" + package->name() + 
+                    stat((package->path() + "/" + package->name() +
                           "/" + "post-install").c_str(), &statData)
                     == 0) {
                     // Work around the pkgdir variable change
-                    Process postProc( "sh", 
+                    Process postProc( "sh",
                                       package->path() + "/" + package->name()+
-                                      "/" + "post-install" );
+                                      "/" + "post-install",
+				      fdlog );
                     if (postProc.executeShell()) {
                         info.postState = FAILED;
                     } else {
@@ -300,12 +304,8 @@ InstallTransaction::installPackage( const Package* package,
         lockFile.unlock();
 #endif
 
-        // restore
-        dup2( tmpout, 1 );
-        dup2( tmperr, 2 );
-
-        close ( fdout );
-        close ( fderr );
+        // Close logfile
+        close ( fdlog );
     }
     return result;
 }

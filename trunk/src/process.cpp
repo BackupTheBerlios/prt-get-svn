@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////////////////////////
 // FILE:        process.cpp
-// AUTHOR:      Johannes Winkelmann, jw@tks6.net
+// AUTHORS:     Johannes Winkelmann, jw@tks6.net
+//              Output redirection by Logan Ingalls, log@plutor.org
 // COPYRIGHT:   (c) 2002 by Johannes Winkelmann
 // ---------------------------------------------------------------------
 //  This program is free software; you can redistribute it and/or modify
@@ -33,9 +34,10 @@ using namespace StringHelper;
   create a process
   \param app the application to execute
   \param arguments the arguments to be passed to \a app
+  \param fdlog file descriptor to a log file
 */
-Process::Process( const string& app, const string& arguments )
-    : m_app( app ), m_arguments( arguments )
+Process::Process( const string& app, const string& arguments, int fdlog )
+  : m_app( app ), m_arguments( arguments ), m_fdlog( fdlog )
 {
 }
 
@@ -66,9 +68,16 @@ int Process::execute()
 
     int status = 0;
 
+    int fdpipe[2];
+    pipe( fdpipe );
+
     pid_t pid = fork();
     if ( pid == 0 ) {
         // child process
+        close( fdpipe[0] );
+	dup2( fdpipe[1], 1 );
+	dup2( fdpipe[1], 2 );
+
         execv( m_app.c_str(), argv );
         _exit( EXIT_FAILURE );
     } else if ( pid < 0 ) {
@@ -76,7 +85,23 @@ int Process::execute()
         status = -1;
     } else {
         // parent process
-        if ( waitpid ( pid, &status, 0 ) != pid ) {
+        close( fdpipe[1] );
+
+	char readbuf[1024];
+	int bytes, wpval;
+
+	while ( (wpval = waitpid ( pid, &status, WNOHANG )) == 0 ) {
+	    while ( (bytes=read(fdpipe[0], readbuf, sizeof(readbuf)-1)) > 0 ) {
+	        readbuf[bytes] = 0;
+		printf("%s", readbuf);
+
+		if ( m_fdlog > 0 ) {
+		    write( m_fdlog, readbuf, bytes );
+		}
+	    }
+	}
+
+        if ( wpval != pid ) {
             status = -1;
         }
     }
@@ -96,9 +121,15 @@ int Process::executeShell()
     static const char SHELL[] = "/bin/bash";
     int status = 0;
 
+    int fdpipe[2];
+    pipe( fdpipe );
+
     pid_t pid = fork();
     if ( pid == 0 ) {
-
+        // child process
+        close( fdpipe[0] );
+	dup2( fdpipe[1], 1 );
+	dup2( fdpipe[1], 2 );
 
         execl( SHELL, SHELL, "-c", (m_app + " " + m_arguments).c_str(), NULL );
         _exit( EXIT_FAILURE );
@@ -107,7 +138,25 @@ int Process::executeShell()
         status = -1;
     } else {
         // parent process
-        if ( waitpid ( pid, &status, 0 ) != pid ) {
+        close( fdpipe[1] );
+
+	char readbuf[1024];
+	int bytes, wpval;
+
+	// printf( "%d\n", m_fdlog );
+
+	while ( (wpval = waitpid ( pid, &status, WNOHANG )) == 0 ) {
+	    while ( (bytes=read(fdpipe[0], readbuf, sizeof(readbuf)-1)) > 0 ) {
+	        readbuf[bytes] = 0;
+		printf("%s", readbuf);
+
+		if ( m_fdlog > 0 ) {
+		    write( m_fdlog, readbuf, bytes );
+		}
+	    }
+	}
+
+        if ( wpval != pid ) {
             status = -1;
         }
     }

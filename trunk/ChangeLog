@@ -1,3 +1,9 @@
+* 0.5.7         16.07.2004  Johannes Winkelmann
+- add the --install-root argument to allow installation to a different root
+- add the --rargs switch to pass options to pkgmk in "prt-get remove"
+- add 'removecommand' configuration key
+- add 'runscriptcommand' configuration key
+
 * 0.5.6		06.01.2004  Johannes Winkelmann
 - add four new command line arguments:
   --no-std-config            Don't parse default configuration file

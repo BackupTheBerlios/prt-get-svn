@@ -1,14 +1,49 @@
-soon:
-- parallel download (mt)
-- external dependency list
-- group support
+next release:
+- configuration override/extend
+ [20:01] <cptn> --config-add="prtdir /tmp" even
+ [20:01] <cptn> --config-set="logfile /tmp/%n.log"
+ [20:14] <cptn> prt-get --config-set="prtdir /tmp" \
+                        --config-add="prtdir /usr"
+ [20:14] <cptn> the 'set' would delete the config file's prtdir settings
 
-0.?.0:
+Don't bail out if no prt-get.conf is found if the user specified
+--config-* options
+
+enum KindOfConfig {ADD, SET}
+argparser: user addConfig(string, KindOfConfig);
+config: go through additional configuration options; add and/or replace
+
+- config: 
+  - install-scripts
+  - make_cmd
+  - install_cmd
+ 
+
+
+1.0.0
+
+- sysup
+  - allow injecting of new (uninstalled) dependencies
+  - allow to prohibit recompilation of packages when a dependency failed
+    to be updated in this sysup run
+
+- interchangable commands for pkgmk/pkgadd
+- better reports (installed/failed/not even tried to install)
+[ ] message log for prt-get messages ?
+[ ] timestamps for the log file 
+[ ] --quiet mode; suppress output of pkgmk and pkgadd
+[ ] prt-get diff stats: "100 Packages with differences"
+[ ] direct options for -im, -uf, -fr (force rebuild), -fi (force install)
+
+---------------------------
+
+later
+
+- parallel download (mt)
+- group support
 - Actions/Commands
   - Help per command
 - Dynamic command binding
-- common check for minArgs maxArgs exactArgs
-- abstract core and client (e.g. install and installtransaction)
 - Make InstallTransaction a real install transaction:
   - rollback pre-install if package building failed
   - needs heavy refactoring to be easier to understand/maintain
@@ -19,28 +54,18 @@ soon:
   - etc.
   - Transaction handler
 - better examples for man page
-
-0.5.x:
-
-[ ] reorder message to avoid losing the important bits when installing
+- reorder message to avoid losing the important bits when installing
     _lots_ of packages; maybe also think about forgeting not so
     important things like packages installed before etc
-[ ] message log for prt-get messages ?
-[ ] timestamps for the log file 
-[ ] --quiet mode; suppress output of pkgmk and pkgadd
-[x] create a separate port for the bash-completion
 
-???
 [ ] prt-get rm and cd
 [ ] cache file class, help class
 [ ] interrupt handler (ctrl-c) kill pkgmk/pkgadd, delete lock files, say
     "prt-get: action cancelled"; warn when cancel during download ->
     STATE variable, separate download and build.
 [ ] lock files for log, cache (lock file class)
-[ ] direct options for -im, -uf, -fr (force rebuild), -fi (force install)
 [ ] move command name out of execTransaction (would be wrong for e.g.
     sysup)
-[ ] prt-get diff stats: "100 Packages with differences"
 
 
 SHORT TERM
@@ -89,6 +114,8 @@ LONG TERM
 
 * new features
   - list shadow packages (dup) for arguments 
+
+* - rebuild all ports using dependency information
 
 
 LONG LONG TERM

@@ -79,6 +79,9 @@ int main( int argc, char** argv )
         case ArgParser::INSTALL:
             prtGet.install();
             break;
+        case ArgParser::DEPINST:
+            prtGet.install(false, true, true);
+            break;
         case ArgParser::GRPINST:
             prtGet.install( false, true );
             break;

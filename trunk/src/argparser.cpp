@@ -110,10 +110,10 @@ const string& ArgParser::alternateConfigFile() const
 */
 bool ArgParser::parse()
 {
-    const int commandCount = 31;
+    const int commandCount = 32;
     string commands[commandCount] = { "list", "search", "dsearch",
                                       "info",
-                                      "depends", "install",
+                                      "depends", "install", "depinst",
                                       "help", "isinst", "dup", "update",
                                       "quickdep", "diff", "quickdiff",
                                       "grpinst", "version", "cache",
@@ -124,7 +124,7 @@ bool ArgParser::parse()
                                       "remove" };
 
     Type commandID[commandCount] = { LIST, SEARCH, DSEARCH, INFO,
-                                     DEPENDS, INSTALL,
+                                     DEPENDS, INSTALL, DEPINST,
                                      HELP, ISINST, DUP, UPDATE,
                                      QUICKDEP, DIFF, QUICKDIFF,
                                      GRPINST, SHOW_VERSION, CREATE_CACHE,

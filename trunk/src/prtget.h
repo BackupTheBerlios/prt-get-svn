@@ -36,6 +36,15 @@ class PrtGet
     : public SignalHandler
 {
 public:
+    
+    enum PGReturnStates { 
+        PG_GENERAL_ERROR = -1,
+        PG_OK = 0, 
+        PG_ARG_ERROR, 
+        PG_INSTALL_ERROR,
+        PG_PARTIAL_INSTALL_ERROR
+    };
+    
     PrtGet( const ArgParser* parser );
     ~PrtGet();
 
@@ -51,7 +60,9 @@ public:
     void isInstalled();
     void readme();
 
-    void install( bool update=false, bool group=false );
+    void install( bool update=false, 
+                  bool group=false, 
+                  bool dependencies=false );
     void sysup();
     void current();
     void printDepends( bool simpleListing=false );
@@ -85,7 +96,7 @@ protected:
 
     void executeTransaction( InstallTransaction& transaction,
                              bool update, bool group );
-    void printResult( InstallTransaction& transaction,
+    void evaluateResult( InstallTransaction& transaction,
                       bool update,
                       bool interrupted=false );
     void reportPrePost(const InstallTransaction::InstallInfo& info);
@@ -117,6 +128,10 @@ protected:
     /*! Name of default cache file */
     static const string DEFAULT_CACHE_FILE;
 
+    
+    void assertMinArgCount(int count);
+    void assertMaxArgCount(int count);
+    void assertExactArgCount(int count);
 
 };
 

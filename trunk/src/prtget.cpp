@@ -49,7 +49,7 @@ PrtGet::PrtGet( const ArgParser* parser )
       m_config( 0 ),
       m_parser( parser ),
       m_cacheFile( DEFAULT_CACHE_FILE ),
-      m_returnValue( 0 ),
+      m_returnValue( PG_OK ),
       m_currentTransaction( 0 )
 {
     if ( m_parser->wasCalledAsPrtCached() ) {
@@ -192,7 +192,8 @@ void PrtGet::listShadowed()
 {
     if ( m_parser->useCache() ) {
         cout << m_appName << ": command 'dup' can't work on a cache" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 
     initRepo( true );
@@ -215,10 +216,9 @@ void PrtGet::listShadowed()
 void PrtGet::listPackages()
 {
     string arg = "*";
-    if ( m_parser->otherArgs().size() > 1 ) {
-        cerr << m_appName << " list takes at most one argument" << endl;
-        exit( -1 );
-    } else if ( m_parser->otherArgs().size() == 1 ) {
+    assertMaxArgCount(1);
+
+    if ( m_parser->otherArgs().size() == 1 ) {
         arg = *(m_parser->otherArgs().begin());
     }
 
@@ -250,10 +250,7 @@ void PrtGet::listPackages()
 */
 void PrtGet::searchPackages( bool searchDesc )
 {
-    if ( m_parser->otherArgs().size() != 1 ) {
-        cerr << m_appName << " search takes exactly one argument" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(1);
 
     initRepo();
     string arg = *(m_parser->otherArgs().begin());
@@ -272,6 +269,7 @@ void PrtGet::searchPackages( bool searchDesc )
             cout << endl;
         }
     } else {
+        m_returnValue = PG_GENERAL_ERROR;
         cout << "No matching packages found"  << endl;
     }
 }
@@ -279,10 +277,7 @@ void PrtGet::searchPackages( bool searchDesc )
 /*! print info for a package */
 void PrtGet::printInfo()
 {
-    if ( m_parser->otherArgs().size() != 1 ) {
-        cerr << m_appName << " info takes exactly one argument" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(1);
 
     initRepo();
     string arg = *(m_parser->otherArgs().begin());
@@ -316,7 +311,8 @@ void PrtGet::printInfo()
 
     } else {
         cerr << "Package " << arg << " not found" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 }
 
@@ -337,7 +333,8 @@ void PrtGet::initRepo( bool listDuplicate )
                 m_repo->initFromCache( m_cacheFile );
             if ( result == Repository::ACCESS_ERR  ) {
                 cerr << "Can't open cache file: " << m_cacheFile << endl;
-                exit( -1 );
+                m_returnValue = PG_GENERAL_ERROR;
+                return;
             } else if ( result == Repository::FORMAT_ERR ) {
                 cerr << "warning: your cache file "
                      << m_cacheFile << " was made with an "
@@ -345,7 +342,8 @@ void PrtGet::initRepo( bool listDuplicate )
                      << "of prt-get."
                      << "\nPlease regenerate it using"
                      << "\n  prt-get cache" << endl;
-                exit( -1 );
+                m_returnValue = PG_GENERAL_ERROR;
+                return;
             }
 
             struct stat cacheStat;
@@ -357,7 +355,8 @@ void PrtGet::initRepo( bool listDuplicate )
                      << "Configuration changed after generating cache"
                      << endl;
                 cerr << "regenerate cache using 'prt-get cache'" << endl;
-                exit( -1 );
+                m_returnValue = PG_GENERAL_ERROR;
+                return;
             }
 
             if ( !m_parser->wasCalledAsPrtCached() ) {
@@ -373,10 +372,7 @@ void PrtGet::initRepo( bool listDuplicate )
 /*! print whether a package is installed or not */
 void PrtGet::isInstalled()
 {
-    if ( m_parser->otherArgs().size() < 1 ) {
-        cerr << m_appName << " isinst takes at least one argument" << endl;
-        exit( -1 );
-    }
+    assertMinArgCount(1);
 
     const list<char*>& l = m_parser->otherArgs();
     list<char*>::const_iterator it = l.begin();
@@ -384,8 +380,9 @@ void PrtGet::isInstalled()
         if ( m_pkgDB.isInstalled( *it ) ) {
             cout << "package " << *it << " is installed" << endl;
         } else {
-            m_returnValue = 1;
             cout << "package " << *it << " is not installed" << endl;
+            m_returnValue = PG_GENERAL_ERROR;
+            return;
         }
     }
 }
@@ -394,11 +391,10 @@ void PrtGet::isInstalled()
 /*! list installed packages */
 void PrtGet::listInstalled()
 {
+    assertMaxArgCount(1);
+
     string arg = "*";
-    if ( m_parser->otherArgs().size() > 1 ) {
-        cerr << m_appName << " listinst takes at most one argument" << endl;
-        exit( -1 );
-    } else if ( m_parser->otherArgs().size() == 1 ) {
+    if ( m_parser->otherArgs().size() == 1 ) {
         arg = *(m_parser->otherArgs().begin());
     }
 
@@ -408,7 +404,8 @@ void PrtGet::listInstalled()
 
     if ( l.empty() && m_parser->otherArgs().size() > 0 ) {
         cerr << m_appName << ": No matching packages found" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 
     if ( m_parser->verbose() > 1 ) {
@@ -437,14 +434,9 @@ void PrtGet::listInstalled()
    \param group whether it's a group install (stop on error)
 
 */
-void PrtGet::install( bool update, bool group )
+void PrtGet::install( bool update, bool group, bool dependencies )
 {
-    if ( m_parser->otherArgs().size() < 1 ) {
-        cerr << m_appName << " " << m_parser->commandName()
-             << " takes at least one argument" << endl;
-        exit( -1 );
-    }
-
+    assertMinArgCount(1);
 
     // this can be done without initRepo()
     const list<char*>& args = m_parser->otherArgs();
@@ -455,19 +447,53 @@ void PrtGet::install( bool update, bool group )
             string s = *it;
             if ( !update && m_pkgDB.isInstalled( s ) ) {
                 cout << "package " << s << " is installed" << endl;
+                m_returnValue = PG_GENERAL_ERROR;
                 return;
             } else if ( update && !m_pkgDB.isInstalled( s ) ) {
                 // can't upgrade
                 cout << "package " << s << " is not installed" << endl;
+                m_returnValue = PG_GENERAL_ERROR;
                 return;
             }
         }
     }
-
+    
     initRepo();
-    InstallTransaction transaction( m_parser->otherArgs(),
-                                    m_repo, m_pkgDB, m_config );
-    executeTransaction( transaction, update, group );
+
+    if (dependencies) {
+        // calc dependencies
+        InstallTransaction depTransaction( m_parser->otherArgs(),
+                                           m_repo, m_pkgDB, m_config );
+        InstallTransaction::InstallResult result = 
+            depTransaction.calcDependencies();
+    
+        // TODO: code duplication with printDepends!
+        if ( result == InstallTransaction::CYCLIC_DEPEND ) {
+            cerr << "prt-get: cyclic dependencies found" << endl;
+            m_returnValue = PG_GENERAL_ERROR;
+            return;
+        } else if ( result == InstallTransaction::PACKAGE_NOT_FOUND ) {
+            cerr << "prt-get: One or more packages could not be found" << endl;
+            m_returnValue = PG_GENERAL_ERROR;
+            return;
+        }
+        const list<string>& depRef = depTransaction.dependencies();
+        list<string>::const_iterator it = depRef.begin();
+        
+        list<string> deps;
+        for (; it != depRef.end(); ++it) {
+            if (!m_pkgDB.isInstalled(*it)) {
+                deps.push_back(*it);
+            }
+        }
+        
+        InstallTransaction transaction( deps, m_repo, m_pkgDB, m_config );
+        executeTransaction( transaction, update, group );
+    } else {
+        InstallTransaction transaction( m_parser->otherArgs(),
+                                        m_repo, m_pkgDB, m_config );
+        executeTransaction( transaction, update, group );
+    }
 }
 
 void PrtGet::executeTransaction( InstallTransaction& transaction,
@@ -530,10 +556,12 @@ void PrtGet::executeTransaction( InstallTransaction& transaction,
     }
 
     if ( !failed ) {
-        printResult( transaction, update );
+        evaluateResult( transaction, update );
         if ( m_parser->isTest() ) {
             cout << "\n*** " << m_appName << ": test mode end" << endl;
         }
+    } else {
+        m_returnValue = PG_INSTALL_ERROR;
     }
 
     m_currentTransaction = 0;
@@ -545,10 +573,7 @@ void PrtGet::executeTransaction( InstallTransaction& transaction,
 */
 void PrtGet::printDepends( bool simpleListing )
 {
-    if ( m_parser->otherArgs().size() < 1 ) {
-        cerr << m_appName << " depends takes at least one argument" << endl;
-        exit( -1 );
-    }
+    assertMinArgCount(1);
 
     initRepo();
 
@@ -557,10 +582,12 @@ void PrtGet::printDepends( bool simpleListing )
     InstallTransaction::InstallResult result = transaction.calcDependencies();
     if ( result == InstallTransaction::CYCLIC_DEPEND ) {
         cerr << "prt-get: cyclic dependencies found" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     } else if ( result == InstallTransaction::PACKAGE_NOT_FOUND ) {
         cerr << "prt-get: One or more packages could not be found" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 
     const list<string>& deps = transaction.dependencies();
@@ -618,7 +645,8 @@ void PrtGet::readConfig()
     if ( !m_config->parse() ) {
         cerr << "Can't read config file " << fName
              << ". Exiting" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 }
 
@@ -661,7 +689,8 @@ void PrtGet::printDiff()
     }
     if ( l.size() < m_parser->otherArgs().size() ) {
         cerr << "prt-get: no matching installed packages found" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 
 #if 0
@@ -673,7 +702,8 @@ void PrtGet::printDiff()
     for ( ; checkIt != l.end(); ++checkIt ) {
         if ( ! m_pkgDB.isInstalled( *checkIt )  ) {
             cerr << "Port not installed: " << *checkIt << endl;
-            exit( -1 );
+            m_returnValue = PG_GENERAL_ERROR;
+            return;
         }
     }
 #endif
@@ -742,10 +772,7 @@ void PrtGet::printDiff()
 /*! print path to a port */
 void PrtGet::printPath()
 {
-    if ( m_parser->otherArgs().size() != 1 ) {
-        cerr << m_appName << " path takes exactly one argument" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(1);
 
     initRepo();
     string arg = *(m_parser->otherArgs().begin());
@@ -754,13 +781,14 @@ void PrtGet::printPath()
         cout << p->path() << "/" << p->name() << endl;
     } else {
         cerr << "Package " << arg << " not found" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 }
 
 
 /*! helper method to print the result of an InstallTransaction */
-void PrtGet::printResult( InstallTransaction& transaction,
+void PrtGet::evaluateResult( InstallTransaction& transaction,
                           bool update,
                           bool interrupted )
 {
@@ -778,7 +806,7 @@ void PrtGet::printResult( InstallTransaction& transaction,
         ++errors;
         cout << endl << "-- Packages not found" << endl;
         list< pair<string, string> >::const_iterator mit = missing.begin();
-
+        
         for ( ; mit != missing.end(); ++mit ) {
             cout << mit->first;
             if ( mit->second != "" ) {
@@ -858,6 +886,8 @@ void PrtGet::printResult( InstallTransaction& transaction,
 
     if ( errors == 0 && !interrupted ) {
         cout << "prt-get: " << command[1] << " successfully" << endl;
+    } else {
+        m_returnValue = PG_PARTIAL_INSTALL_ERROR;
     }
 }
 
@@ -885,19 +915,22 @@ void PrtGet::createCache()
     if ( m_parser->wasCalledAsPrtCached() ) {
         cerr << m_appName << ": Can't create cache from cache. "
              << "Use prt-get instead" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 
     initRepo();
     Repository::WriteResult result = m_repo->writeCache( m_cacheFile );
     if ( result == Repository::DIR_ERR ) {
         cerr << "Can't create cache directory " << m_cacheFile << endl;
-        exit ( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
     if ( result == Repository::FILE_ERR ) {
         cerr << "Can't open cache file " << m_cacheFile << " for writing"
              << endl;
-        exit ( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 
 }
@@ -968,10 +1001,7 @@ void PrtGet::printf()
 {
     map<string, string> sortedOutput;
 
-    if ( m_parser->otherArgs().size() != 1 ) {
-        cerr << m_appName << " printf takes exactly one argument" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(1);
 
     initRepo();
     string filter = "*";
@@ -1056,10 +1086,7 @@ void PrtGet::printf()
 
 void PrtGet::readme()
 {
-    if ( m_parser->otherArgs().size() != 1 ) {
-        cerr << m_appName << " readme takes exactly one argument" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(1);
 
     initRepo();
     string arg = *(m_parser->otherArgs().begin());
@@ -1077,17 +1104,15 @@ void PrtGet::readme()
 
     } else {
         cerr << "Package " << arg << " not found" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 }
 
 
 void PrtGet::printDependendent()
 {
-    if ( m_parser->otherArgs().size() != 1 ) {
-        cerr << m_appName << " dependent takes exactly one argument" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(1);
 
     initRepo();
     string arg = *(m_parser->otherArgs().begin());
@@ -1166,10 +1191,12 @@ void PrtGet::sysup()
         InstallTransaction::InstallResult result = depTrans.calcDependencies();
         if ( result == InstallTransaction::CYCLIC_DEPEND ) {
             cerr << "cyclic dependencies" << endl;
-            exit( -1 );
+            m_returnValue = PG_GENERAL_ERROR;
+            return;
         } else if ( result == InstallTransaction::PACKAGE_NOT_FOUND ) {
             cerr << "One or more packages could not be found" << endl;
-            exit( -1 );
+            m_returnValue = PG_GENERAL_ERROR;
+            return;
         }
 
         const list<string>& deps = depTrans.dependencies();
@@ -1224,10 +1251,7 @@ void PrtGet::expandWildcardsRepo( const list<char*>& in, list<string>& target )
 
 void PrtGet::current()
 {
-    if ( m_parser->otherArgs().size() < 1 ) {
-        cerr << m_appName << " current takes exactly one argument" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(1);
 
     const map<string, string>& installed = m_pkgDB.installedPackages();
     map<string, string>::const_iterator it = installed.begin();
@@ -1251,7 +1275,7 @@ SignalHandler::HandlerResult PrtGet::handleSignal( int signal )
 
     cout << "prt-get: interrupted" << endl;
     if ( m_currentTransaction ) {
-        printResult( *m_currentTransaction, false, true );
+        evaluateResult( *m_currentTransaction, false, true );
     }
 }
 
@@ -1262,11 +1286,10 @@ SignalHandler::HandlerResult PrtGet::handleSignal( int signal )
 */
 void PrtGet::fsearch()
 {
+    assertMinArgCount(1);
+   
     string arg = "*";
-    if ( m_parser->otherArgs().size() != 1 ) {
-        cerr << m_appName << " list takes exactly least one argument" << endl;
-        exit( -1 );
-    } else if ( m_parser->otherArgs().size() == 1 ) {
+    if ( m_parser->otherArgs().size() == 1 ) {
         arg = *(m_parser->otherArgs().begin());
     }
 
@@ -1298,17 +1321,13 @@ void PrtGet::fsearch()
     }
 
     if ( first ) {
-        m_returnValue = -1;
+        m_returnValue = PG_GENERAL_ERROR;
     }
 }
 
 void PrtGet::setLock( bool lock )
 {
-    if ( m_parser->otherArgs().size() < 1 ) {
-        cerr << m_appName << " " << m_parser->commandName()
-             <<  " takes at least one argument" << endl;
-        exit( -1 );
-    }
+    assertMinArgCount(1);
 
     if ( lock ) {
         initRepo();
@@ -1322,23 +1341,23 @@ void PrtGet::setLock( bool lock )
             if ( p ) {
                 if (!m_locker.lock( *it )) {
                     cerr << "Already locked: " << *it << endl;
-                    m_returnValue = -1;
+                    m_returnValue = PG_GENERAL_ERROR;
                 }
             } else {
                 cerr << "Package not found: " << *it << endl;
-                m_returnValue = -1;
+                m_returnValue = PG_GENERAL_ERROR;
             }
 
         } else {
             if ( !m_locker.unlock( *it ) ) {
                 cerr << "Not locked previously: " << *it << endl;
-                m_returnValue = -1;
+                m_returnValue = PG_GENERAL_ERROR;
             }
         }
     }
     if (!m_locker.store()) {
         cerr << "Failed to write lock data" << endl;
-        m_returnValue = -1;
+        m_returnValue = PG_GENERAL_ERROR;
     }
 }
 
@@ -1347,7 +1366,7 @@ void PrtGet::listLocked()
     // shares some code with listInstalled
     if ( m_locker.openFailed() ) {
         cerr << "Failed to open lock data file" << endl;
-        m_returnValue = -1;
+        m_returnValue = PG_GENERAL_ERROR;
     }
 
     const map<string, string>& l = m_pkgDB.installedPackages();
@@ -1384,10 +1403,7 @@ void PrtGet::listLocked()
 
 void PrtGet::edit()
 {
-    if ( m_parser->otherArgs().size() != 2 ) {
-        cerr << m_appName << " edit takes exactly two arguments" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(2);
 
     char* editor = getenv("EDITOR");
     if (editor) {
@@ -1405,22 +1421,22 @@ void PrtGet::edit()
             }
         } else {
             cerr << "Package " << arg << " not found" << endl;
-            exit(-1);
+            m_returnValue = PG_GENERAL_ERROR;
+            return;
         }
 
     } else {
         cerr << "Environment variable EDITOR not set" << endl;;
-        exit(-1);
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 
 }
 
 void PrtGet::ls()
 {
-    if ( m_parser->otherArgs().size() != 1 ) {
-        cerr << m_appName << " ls takes exactly one argument" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(1);
+    
     initRepo();
 
     list<char*>::const_iterator it = m_parser->otherArgs().begin();
@@ -1446,16 +1462,14 @@ void PrtGet::ls()
         }
     } else {
         cerr << "Package " << arg << " not found" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 }
 
 void PrtGet::cat()
 {
-    if ( m_parser->otherArgs().size() != 2 ) {
-        cerr << m_appName << " cat takes exactly two arguments" << endl;
-        exit( -1 );
-    }
+    assertExactArgCount(2);
 
     initRepo();
 
@@ -1473,22 +1487,20 @@ void PrtGet::cat()
             fclose( fp );
         } else {
             cerr << "File " << *it << " not found" << endl;
-            exit( -1 );
+            m_returnValue = PG_GENERAL_ERROR;
+            return;
         }
 
     } else {
         cerr << "Package " << arg << " not found" << endl;
-        exit( -1 );
+        m_returnValue = PG_GENERAL_ERROR;
+        return;
     }
 }
 
 void PrtGet::remove()
 {
-    if ( m_parser->otherArgs().size() < 1 ) {
-        cerr << m_appName << " " << m_parser->commandName()
-             <<  " takes at least one argument" << endl;
-        exit( -1 );
-    }
+    assertMinArgCount(1);
 
     list<string> removed;
     list<string> failed;
@@ -1549,4 +1561,34 @@ void PrtGet::remove()
 
 
 
+}
+
+void PrtGet::assertMaxArgCount(int count)
+{
+    if ( m_parser->otherArgs().size() > 1 ) {
+        cerr << m_appName << " " 
+             << m_parser->commandName() << " takes at most " 
+             << count << (count > 1 ? " arguments" : " argument") << endl;
+        exit(PG_ARG_ERROR);
+    }
+}
+
+void PrtGet::assertExactArgCount(int count)
+{
+    if ( m_parser->otherArgs().size() != count ) {
+        cerr << m_appName << " " 
+             << m_parser->commandName() << " takes exactly "
+             << count << (count > 1 ? " arguments" : " argument") << endl;
+        exit(PG_ARG_ERROR);
+    }
+}
+
+void PrtGet::assertMinArgCount(int count)
+{
+     if ( m_parser->otherArgs().size() < count ) {
+        cerr << m_appName 
+             << m_parser->commandName() << "takes at least "
+             << count << (count > 1 ? " arguments" : " argument") << endl;
+        exit(PG_ARG_ERROR);
+     }   
 }

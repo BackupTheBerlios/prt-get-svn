@@ -1,5 +1,15 @@
+* 0.5.9         06.12.2004  Johannes Winkelmann
+- add alias support
+- use absolut pathes for commands (pkgmk et al)
+- add -v switch to 'info' to show the readme
+- fix 'keephigher' in default prt-get.conf
+- add deptree to 'help'
+- remove some debug test
+- prettify error message when packages are not found
+- change 'bash' to 'sh' in process.cpp
+
 * 0.5.8		31.10.2004  Johannes Winkelmann
-- re-enable version parseing; use --parse-versions to make prt-get use
+- re-enable version parseing; use --prefer-higher to make prt-get use
   it
 - implement shortcuts to frequentily used pkgmk/pkgadd options
 - make -f do 'pkgadd -f'

@@ -14,7 +14,7 @@ _prt-get()
 
 	if [ $COMP_CWORD -eq 1 ]; then
 		COMPREPLY=( $( compgen -W ' \
-                    install update grpinst help version readme \
+                    install depinst update grpinst help version readme \
                     list info path search dsearch fsearch printf cache \
                     dependent sysup current lock unlock listlocked \
                     diff quickdiff depends quickdep dup isinst \
@@ -25,7 +25,7 @@ _prt-get()
         if [ $COMP_CWORD '>' 1 ]; then
             if [[ "$cur" != -* ]]; then
 	        case ${COMP_WORDS[1]} in
-                    "install" | "grpinst"  | "path" | "dependent" | \
+                    "install" | "depinst" | "grpinst"  | "path" | "dependent" | \
                     "depends" | "quickdep" | "info" | "readme" | \
                     "ls" )
     		 	    if [ -f /var/lib/pkg/prt-get.cache ]; then

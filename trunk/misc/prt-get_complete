@@ -14,11 +14,13 @@ _prt-get()
 
 	if [ $COMP_CWORD -eq 1 ]; then
 		COMPREPLY=( $( compgen -W ' \
-                    install depinst update grpinst help version readme \
-                    list info path search dsearch fsearch printf cache \
-                    dependent sysup current lock unlock listlocked \
-                    diff quickdiff depends quickdep dup isinst \
-                    cat ls edit remove listinst' $cur ))
+                    install depinst update grpinst help \
+                    version readme list info path \
+                    search dsearch fsearch printf cache \
+                    dependent sysup current lock unlock \
+                    listlocked diff quickdiff depends quickdep \
+                    dup isinst cat ls edit \
+                    remove listinst' $cur ))
         fi
 
        

@@ -75,7 +75,9 @@ _prt-get()
 					            --config-append= \
 					            --config-prepend= \
 					            --config-set= \
-                                                    --aargs= --margs=' \
+                                                    --aargs= --margs= \
+						    --rargs= \
+                                                    --install-root=' \
                                                      -- $cur ) )
                         ;;
                     "list" | "search" | "dsearch" )

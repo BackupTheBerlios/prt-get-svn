@@ -54,7 +54,9 @@ prt\-get also offers some features like searching ports by name,
 showing information about ports (without installing them of course)
 and can list the dependencies listed in the Pkgfile, and provide a
 complete dependency list for a port. Note that dependencies are no
-requirement for crux packages and therefore not always accurate
+requirement for crux packages and therefore not always accurate. There's
+a possiblity to use an external dependency map to get dependency
+listings for ports which don't provide them in their Pkgfile.
 
 .PP 
 
@@ -412,8 +414,19 @@ arguments to be passed to pkgadd, relevant for
 .B prt\-get install, prt\-get grpinst, prt\-get update
 
 .TP 
+.B \-\-rargs="..."
+arguments to be passed to pkgrm; currently not used, implemented for
+future uses and consistency reasons
+
+.TP 
 .B \-\-config=<file>
 Use alternative configuration file to read ports directories from
+
+.TP
+.B \-\-install-root=<dir>
+Use <dir> as root directory for your installation; allows to install to
+a different directory than '/'. In daily usage, this option is not
+required; helpful if you're developing an independent installation.
 
 .TP 
 .B \-\-log

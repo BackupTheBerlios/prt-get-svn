@@ -1,8 +1,15 @@
+* 0.5.8		31.10.2004  Johannes Winkelmann
+- re-enable version parseing; use --parse-versions to make prt-get use
+  it
+- implement shortcuts to frequentily used pkgmk/pkgadd options
+- make -f do 'pkgadd -f'
+
 * 0.5.7         16.07.2004  Johannes Winkelmann
 - add the --install-root argument to allow installation to a different root
 - add the --rargs switch to pass options to pkgmk in "prt-get remove"
 - add 'removecommand' configuration key
 - add 'runscriptcommand' configuration key
+- improve config parsing: options can now be in front of command
 
 * 0.5.6		06.01.2004  Johannes Winkelmann
 - add four new command line arguments:

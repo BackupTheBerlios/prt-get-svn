@@ -188,6 +188,8 @@ void PrtGet::printUsage()
     cout << "                --cache             Use a cache file" << endl;
     cout << "                --config=<file>     Use alternative "
          << "configuration file" << endl;
+    cout << "                --install-root=..   Use alternative "
+         << "install root directory" << endl;
 
     cout << "                --v                 Show version in listing"
          << endl;
@@ -753,7 +755,7 @@ void PrtGet::printQuickDiff()
             p = m_repo->getPackage( it->first );
             if ( p ) {
                 if ( greaterThan( p->version() + "-" + p->release(),
-                                  it->second ) ) {
+                                  it->second, m_parser->keepHigher() ) ) {
                     cout <<  it->first.c_str() << " ";
                 }
             }
@@ -808,7 +810,7 @@ void PrtGet::printDiff()
             }
 
             if ( greaterThan( p->version() + "-" + p->release(),
-                              it->second ) ) {
+                              it->second, m_parser->keepHigher() ) ) {
                 if ( !m_locker.isLocked( it->first )  ||
                      m_parser->otherArgs().size() > 0 ||
                      m_parser->all() ) {
@@ -1030,54 +1032,96 @@ void PrtGet::createCache()
 /*!
   \return true if v1 is greater than v2
  */
-bool PrtGet::greaterThan( const string& v1, const string& v2 )
+bool PrtGet::greaterThan( const string& v1, 
+                          const string& v2, 
+                          bool parseVersion )
 {
+    if (v1 == v2) {
+        return false;
+    }
+    
+    if (parseVersion) {
 
-    // TODO: think whether this should be enabled
-#if 0
-
-    string tmp_v1 = getValueBefore( v1, '-' );
-    string tmp_v2 = getValueBefore( v2, '-' );
-    string tmp_r1 = getValue( v1, '-' );
-    string tmp_r2 = getValue( v2, '-' );
-
-    list<string> v1l = split( tmp_v1, '.' );
-    v1l.push_back( tmp_r1 );
-
-    list<string> v2l = split( tmp_v2, '.' );
-    v2l.push_back( tmp_r2 );
-
-    if ( v1l.size() == v2l.size() ) {
-        list<string>::iterator it1 = v1l.begin();
-        list<string>::iterator it2 = v2l.begin();
-        char* error = 0;
-        for ( ; it1 != v1l.end() && it2 != v2l.end(); ++it1, ++it2 ) {
-            error = 0;
-            long iv1 = strtol( (*it1).c_str(), &error, 10 );
-            if ( *error != 0 ) {
-                break;
+        string tmp_v1 = getValueBefore( v1, '-' );
+        string tmp_v2 = getValueBefore( v2, '-' );
+        tmp_v1 = getValueBefore( tmp_v1, '_');
+        tmp_v2 = getValueBefore( tmp_v2, '_');
+        
+        list<string> v1l;
+        split( tmp_v1, '.', v1l );
+        
+        list<string> v2l;
+        split( tmp_v2, '.', v2l );
+        
+        if (v1l.size() > v2l.size()) {
+            while (v1l.size() > v2l.size()) {
+                v2l.push_back("-1");
             }
-            error = 0;
-            long iv2 = strtol( it2->c_str(), &error, 10 );
-            if ( *error != 0 ) {
-                break;
-            }
-            if ( iv1 < iv2 ) {
-#if 0
-                cout << "False: " << v1 << ">" << v2 << endl;
-#endif
-                return false;
-            } else if ( iv1 > iv2 ) {
-                return true;
+        } else if (v1l.size() < v2l.size()) {
+            while (v1l.size() < v2l.size()) {
+                v1l.push_back("-1");
             }
         }
+        
+        // handle 1.2_2 versions; avoid the following case:
+        // 1.2_2 < 1.2.1
+        string subrelease1 = getValue( v1, '_' );
+        subrelease1 = getValueBefore( subrelease1, '-');
+        string subrelease2 = getValue( v2, '_' );
+        subrelease2 = getValueBefore( subrelease2, '-');
+        if (subrelease1 == "") {
+            subrelease1 = "-1";
+        }
+        if (subrelease2 == "") {
+            subrelease2 = "-1";
+        }
+        v1l.push_back( subrelease1 );
+        v2l.push_back( subrelease2 );
+                
+        string tmp_r1 = getValue( v1, '-' );
+        string tmp_r2 = getValue( v2, '-' );
+        v1l.push_back( tmp_r1 );
+        v2l.push_back( tmp_r2 );
+        
+        if ( true || v1l.size() == v2l.size() ) {
+            list<string>::iterator it1 = v1l.begin();
+            list<string>::iterator it2 = v2l.begin();
+            char* error = 0;
+            for ( ; it1 != v1l.end() && it2 != v2l.end(); ++it1, ++it2 ) {
+                error = 0;
+                long iv1 = strtol( (*it1).c_str(), &error, 10 );
+                if ( *error != 0 ) {
+                    break;
+                }
+                error = 0;
+                long iv2 = strtol( it2->c_str(), &error, 10 );
+                if ( *error != 0 ) {
+                    break;
+                }
+#if 0
+                    cout << "DEBUG: " << v1 << " <? " << v2 << " ( " 
+                         << iv1 << " <? " << iv2 << endl;
+#endif
+                if ( iv1 < iv2 ) {
+#if 0
+               cout << "DEBUG: " << v1 << " <? " << v2 << " ( " 
+                    << iv1 << " <? " << iv2 << endl;
+#endif
+                    return false;
+                } else if ( iv1 > iv2 ) {
+                    
+                    
+                    
+                    return true;
+                }
+            }
 
-        if ( error == 0 ) {
-            // same
-            return false;
+            if ( error == 0 ) {
+                // same
+                return false;
+            }
         }
     }
-#endif
 
     return v1 != v2;
 }
@@ -1263,7 +1307,7 @@ void PrtGet::sysup()
             p = m_repo->getPackage( it->first );
             if ( p ) {
                 if ( greaterThan( p->version() + "-" + p->release(),
-                                  it->second ) ) {
+                                  it->second, m_parser->keepHigher() ) ) {
                     packagesToUpdate.push_back( it->first );
                 }
             }
@@ -1271,6 +1315,7 @@ void PrtGet::sysup()
     }
 
     if ( packagesToUpdate.empty() ) {
+        cout << "System is up to date" << endl;
         return;
     }
 
@@ -1595,7 +1640,7 @@ void PrtGet::cat()
 void PrtGet::remove()
 {
     assertMinArgCount(1);
-    
+
     readConfig();
 
     list<string> removed;
@@ -1825,7 +1870,7 @@ void PrtGet::dumpConfig()
         cout.fill( ' ' );
         cout << "Runscript command: " << m_config->runscriptCommand() << endl;
     }
-    
+
     cout.setf( ios::left, ios::adjustfield );
     cout.width( 20 );
     cout.fill( ' ' );
@@ -1881,6 +1926,4 @@ void PrtGet::dumpConfig()
         }
         cout << endl;
     }
-
-
 }

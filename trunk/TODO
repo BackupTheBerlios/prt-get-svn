@@ -13,11 +13,6 @@ enum KindOfConfig {ADD, SET}
 argparser: user addConfig(string, KindOfConfig);
 config: go through additional configuration options; add and/or replace
 
-- config: 
-  - install-scripts
-  - make_cmd
-  - install_cmd
- 
 
 
 1.0.0
@@ -27,19 +22,18 @@ config: go through additional configuration options; add and/or replace
   - allow to prohibit recompilation of packages when a dependency failed
     to be updated in this sysup run
 
-- interchangable commands for pkgmk/pkgadd
 - better reports (installed/failed/not even tried to install)
 [ ] message log for prt-get messages ?
 [ ] timestamps for the log file 
 [ ] --quiet mode; suppress output of pkgmk and pkgadd
 [ ] prt-get diff stats: "100 Packages with differences"
-[ ] direct options for -im, -uf, -fr (force rebuild), -fi (force install)
 
 ---------------------------
 
 later
 
 - parallel download (mt)
+- download only
 - group support
 - Actions/Commands
   - Help per command
@@ -87,8 +81,6 @@ SHORT TERM
 
 * functional
   - check exit messages (strings). always add 'prt-get'
-  - simple version handling to mark ports older in the repository than
-    installed (Done; disabled)
   
 * refactor
   - check operations in prtget.cpp for common code

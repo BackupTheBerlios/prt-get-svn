@@ -31,7 +31,7 @@ Configuration::Configuration( const std::string& configFile,
       m_cacheFile( "" ),
       m_readmeMode( VERBOSE_README ),
       m_runScripts( false ),
-      m_makeCommand( "" ), m_addCommand( "" ), 
+      m_makeCommand( "" ), m_addCommand( "" ),
       m_removeCommand( "" ), m_runscriptCommand( "" )
 {
 

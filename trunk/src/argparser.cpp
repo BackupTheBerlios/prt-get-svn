@@ -13,7 +13,6 @@ using namespace std;
 
 #include "argparser.h"
 
-
 /*!
   Construct a ArgParser object
   \param argc argument count
@@ -40,7 +39,8 @@ ArgParser::ArgParser( int argc, char** argv )
       m_nodeps( false ),
       m_all( false ),
       m_execPreInstall( false ),
-      m_execPostInstall( false )
+      m_execPostInstall( false ),
+      m_keepHigher( false )
 {
 }
 
@@ -153,20 +153,7 @@ bool ArgParser::parse()
         m_calledAsPrtCache = true;
     }
 
-    // find the command
-    string s = m_argv[1];
-    for ( int i = 0; i < commandCount; ++i ) {
-        if ( s == commands[i] ) {
-            m_isCommandGiven = true;
-            m_commandType = commandID[i];
-            m_commandName = s;
-        }
-    }
-    if ( !m_isCommandGiven ) {
-        return false;
-    }
-
-    for ( int i = 2; i < m_argc; ++i ) {
+    for ( int i = 1; i < m_argc; ++i ) {
         if ( m_argv[i][0] == '-' ) {
             string s = m_argv[i];
             if ( s == "-v" ) {
@@ -194,13 +181,34 @@ bool ArgParser::parse()
                 m_execPostInstall = true;
             } else if ( s == "--no-std-config" ) {
                 m_noStdConfig = true;
+            } else if ( s == "--keep-higher" || s == "-kh" ) {
+                m_keepHigher = true;
+                                
+            } else if ( s == "-f" ) {
+                m_pkgaddArgs += " " + s;
+            } else if ( s == " -fr" ) {
+                m_pkgmkArgs += " -f";
+            } else if ( s == "-if" ) {
+                m_pkgmkArgs += " " + s;
+            } else if ( s == "-uf" ) {
+                m_pkgmkArgs += " " + s;
+            } else if ( s == "-im" ) {
+                m_pkgmkArgs += " " + s;
+            } else if ( s == "-um" ) {
+                m_pkgmkArgs += " " + s;
+            } else if ( s == "-kw" ) {
+                m_pkgmkArgs += " " + s;
+            } else if ( s == "-ns" ) {
+                m_pkgmkArgs += " " + s;
+            } else if ( s == "-fi" ) {
+                m_pkgaddArgs += " -f";
             }
 
             // substrings
             else if ( s.substr( 0, 8 )  == "--margs=" ) {
-                m_pkgmkArgs = s.substr( 8 );
+                m_pkgmkArgs += " " + s.substr( 8 );
             } else if ( s.substr( 0, 8 ) == "--aargs=" ) {
-                m_pkgaddArgs = s.substr( 8 );
+                m_pkgaddArgs += " " + s.substr( 8 );
             } else if ( s.substr( 0, 8 ) == "--rargs=" ) {
                 m_pkgrmArgs = s.substr( 8 );
             } else if ( s.substr( 0, 7 ) == "--sort=" ) {
@@ -222,16 +230,33 @@ bool ArgParser::parse()
             } else if ( s.substr( 0, 15 ) == "--install-root=" ) {
                 m_installRoot = s.substr(15);
             } else {
-                m_unknownOption = s;
+                m_unknownOption = s;                
                 return false;
             }
-
         } else {
-            m_otherArgs.push_back( m_argv[i] );
+            if (!m_isCommandGiven) {
+                string s = m_argv[i];
+                m_commandName = s;
+                for ( int i = 0; i < commandCount; ++i ) {
+                    if ( s == commands[i] ) {
+                        m_isCommandGiven = true;
+                        m_commandType = commandID[i];
+                        break;
+                    }
+                }
+                // first argument must be command
+                if ( !m_isCommandGiven ) {
+                    return false;
+                }
+            } else {
+                m_otherArgs.push_back( m_argv[i] );
+            }
         }
     }
 
-    return true;
+
+
+    return m_isCommandGiven;
 }
 
 
@@ -371,4 +396,9 @@ const string& ArgParser::installRoot() const
 const string& ArgParser::pkgrmArgs() const
 {
     return m_pkgrmArgs;
+}
+
+bool ArgParser::keepHigher() const
+{
+    return m_keepHigher;
 }

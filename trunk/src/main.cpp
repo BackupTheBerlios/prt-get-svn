@@ -21,12 +21,18 @@ int main( int argc, char** argv )
 {
     ArgParser argParser( argc, argv );
     if ( !argParser.parse() ) {
-        if ( !argParser.isCommandGiven() ) {
-            cerr << "prt-get: no command given. "
-                 << "try prt-get help for more information" << endl;
-        } else if (argParser.unknownOption().size() > 0){
+        if (argParser.unknownOption().size() > 0){
             cerr << "prt-get: Unknown option: " << argParser.unknownOption()
                  << endl;
+        } else if ( !argParser.isCommandGiven() ) {
+            if (argParser.commandName() != "") {
+                cerr << "prt-get: Unknown command '" 
+                     << argParser.commandName() << "'. "
+                     << "try prt-get help for more information" << endl;
+            } else {
+                cerr << "prt-get: no command given. "
+                     << "try prt-get help for more information" << endl;
+            }
         }
 
         exit( -1 );

@@ -70,7 +70,7 @@ value -> meaning mapping to be determined...)
 
 .SH "COMMANDS"
 prt\-get uses so called commands, which always have to be the first 
-argument passed. This is very similar to
+non-option argument passed. This is very similar to
 .B cvs(1).
 [command] can be one of the following:
 
@@ -200,7 +200,7 @@ to make an install including dependencies
 
 .TP 
 .B dependent <package>
-print a recursive list of package which depend on
+print a list of package which depend on
 .B package. 
 Only list direct dependencies. Usually shows dependent packages which
 are installed. To see all dependencies, add the --all switch

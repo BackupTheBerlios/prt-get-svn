@@ -52,6 +52,7 @@ public:
     bool all() const;
     bool execPreInstall() const;
     bool execPostInstall() const;
+    bool keepHigher() const;
 
     const string& alternateConfigFile() const;
     const string& pkgmkArgs() const;
@@ -95,6 +96,7 @@ private:
 
     bool m_execPreInstall;
     bool m_execPostInstall;
+    bool m_keepHigher;
 
     string m_alternateConfigFile;
     string m_pkgmkArgs;

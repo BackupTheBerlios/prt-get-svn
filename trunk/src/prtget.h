@@ -36,15 +36,15 @@ class PrtGet
     : public SignalHandler
 {
 public:
-    
-    enum PGReturnStates { 
+
+    enum PGReturnStates {
         PG_GENERAL_ERROR = -1,
-        PG_OK = 0, 
-        PG_ARG_ERROR, 
+        PG_OK = 0,
+        PG_ARG_ERROR,
         PG_INSTALL_ERROR,
         PG_PARTIAL_INSTALL_ERROR
     };
-    
+
     PrtGet( const ArgParser* parser );
     ~PrtGet();
 
@@ -60,8 +60,8 @@ public:
     void isInstalled();
     void readme();
 
-    void install( bool update=false, 
-                  bool group=false, 
+    void install( bool update=false,
+                  bool group=false,
                   bool dependencies=false );
     void sysup();
     void current();
@@ -128,10 +128,11 @@ protected:
     /*! Name of default cache file */
     static const string DEFAULT_CACHE_FILE;
 
-    
+
     void assertMinArgCount(int count);
     void assertMaxArgCount(int count);
     void assertExactArgCount(int count);
+    void argCountFailure(int count, const string& specifier);
 
 };
 

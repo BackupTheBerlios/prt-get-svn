@@ -316,7 +316,7 @@ void PrtGet::printInfo()
         if ( p->hasPostInstall() ) {
             filesString += "post-install ";
         }
-        
+
         if ( filesString.length() > 0 ) {
             filesString = StringHelper::stripWhiteSpace( filesString );
             StringHelper::replaceAll( filesString, " ", "," );
@@ -1582,29 +1582,28 @@ void PrtGet::remove()
 void PrtGet::assertMaxArgCount(int count)
 {
     if ( m_parser->otherArgs().size() > 1 ) {
-        cerr << m_appName << " "
-             << m_parser->commandName() << " takes at most "
-             << count << (count > 1 ? " arguments" : " argument") << endl;
-        exit(PG_ARG_ERROR);
+        argCountFailure(count, "at most");
     }
 }
 
 void PrtGet::assertExactArgCount(int count)
 {
     if ( m_parser->otherArgs().size() != count ) {
-        cerr << m_appName << " "
-             << m_parser->commandName() << " takes exactly "
-             << count << (count > 1 ? " arguments" : " argument") << endl;
-        exit(PG_ARG_ERROR);
+        argCountFailure(count, "exactly");
     }
 }
 
 void PrtGet::assertMinArgCount(int count)
 {
      if ( m_parser->otherArgs().size() < count ) {
-        cerr << m_appName << " "
-             << m_parser->commandName() << " takes at least "
-             << count << (count > 1 ? " arguments" : " argument") << endl;
-        exit(PG_ARG_ERROR);
+         argCountFailure(count, "at least");
      }
+}
+
+void PrtGet::argCountFailure(int count, const string& specifier)
+{
+    cerr << m_appName << " "
+         << m_parser->commandName() << " takes " << specifier << " "
+         << count << (count > 1 ? " arguments" : " argument") << endl;
+    exit(PG_ARG_ERROR);
 }

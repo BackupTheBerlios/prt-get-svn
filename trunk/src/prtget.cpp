@@ -1546,7 +1546,7 @@ void PrtGet::remove()
     }
 
     if ( notInstalled.size() ) {
-        cout << endl << "-- Packages which where not installed"
+        cout << endl << "-- Packages which were not installed"
              << endl;
         list<string>::const_iterator it = notInstalled.begin();
 

@@ -107,15 +107,25 @@ void PrtGet::printUsage()
     cout << "  path     <port>            show path of a port" << endl;
     cout << "  readme   <port>            show a port's readme file "
          << "(if it exists)" << endl;
-    cout << "  diff     <port1 port2...>  list outdated packages (or check "
-         << "args for change); use --all switch to display locked "
-         << endl;
-    cout << "  quickdiff                  same as diff but simple format"
-         << endl;
     cout << "  dup                        Find duplicate ports" << endl;
     cout << "  isinst   <port1 port2...>  print whether ports are installed"
          << endl;
     cout << "  current  <port>            print installed version of port"
+         << endl;
+    
+    cout << "\nDIFFERENCES / CHECK FOR UPDATES" << endl;
+    cout << "  diff     <port1 port2...>  list outdated packages (or check "
+         << "args for change)" << endl;
+    cout << "  quickdiff                  same as diff but simple format"
+         << endl;
+    cout << "          where opt can be:" << endl;
+    cout << "    --all            display locked ports too"
+         << endl;
+    cout << "    --prefer-higher  prefer higher installed "
+         << "versions over lower ports"
+         << endl;
+    cout << "    --strict-diff    override prefer higher "
+         << "configuration setting"
          << endl;
 
     cout << "\nDEPENDENCIES" << endl;
@@ -145,6 +155,12 @@ void PrtGet::printUsage()
     cout << "  remove [opt] <port1 port2...>    remove ports"
          << endl;
     cout << "          where opt can be:" << endl;
+    cout << "                -f, -fi             force installation" << endl;
+    cout << "                -fr                 force rebuild" << endl;
+    cout << "                -uf                 update footprint" << endl;
+    cout << "                -if                 ignore footprint" << endl;
+    cout << "                -um                 update md5sum" << endl;
+    cout << "                -im                 ignore md5sum" << endl;
     cout << "                --margs=<string>    pass 'string' to pkgmk"
          << endl;
     cout << "                --aargs=<string>    pass 'string' to pkgadd"
@@ -169,6 +185,12 @@ void PrtGet::printUsage()
          << endl;
     cout << "                --test              test mode" << endl;
     cout << "                --log               write log file"<< endl;
+    cout << "                --prefer-higher     prefer higher installed "
+         << "versions over lower ones in ports tree"
+         << endl;
+    cout << "                --strict-diff       override prefer higher "
+         << "configuration setting"
+         << endl;
 
     cout << "  lock <port1 port2...>             lock current version "
          << "of packages"

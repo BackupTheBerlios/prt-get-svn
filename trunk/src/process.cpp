@@ -13,16 +13,16 @@
 #include <list>
 using namespace std;
 
-#include <stddef.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
 #include <cassert>
+#include <cstddef>
+#include <cstdlib>
+#include <cstdio>
 
 #include "process.h"
 

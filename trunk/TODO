@@ -1,4 +1,9 @@
-0.6.0:
+soon:
+- parallel download (mt)
+- external dependency list
+- group support
+
+0.?.0:
 - Actions/Commands
   - Help per command
 - Dynamic command binding
@@ -17,6 +22,10 @@
 
 0.5.x:
 
+[ ] reorder message to avoid losing the important bits when installing
+    _lots_ of packages; maybe also think about forgeting not so
+    important things like packages installed before etc
+[ ] message log for prt-get messages ?
 [ ] timestamps for the log file 
 [ ] --quiet mode; suppress output of pkgmk and pkgadd
 [x] create a separate port for the bash-completion

@@ -11,6 +11,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <algorithm>
 
 #include "locker.h"
 #include "repository.h"

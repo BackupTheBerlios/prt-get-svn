@@ -148,6 +148,8 @@ void PrtGet::printUsage()
          << endl;
     cout << "                --aargs=<string>    pass 'string' to pkgadd"
          << endl;
+    cout << "                --rargs=<string>    pass 'string' to pkgrm"
+         << endl;
     cout << "                --test              test mode" << endl;
     cout << "                --log               write log file"<< endl;
     cout << "                --pre-install       execute pre-install script"

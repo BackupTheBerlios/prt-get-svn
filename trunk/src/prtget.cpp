@@ -1251,9 +1251,9 @@ void PrtGet::printDependendent()
 
 void PrtGet::warnPackageNotFound(InstallTransaction& transaction)
 {
-    cerr << "The following package could not be found: ";
+    cerr << "The package '";
     cerr << transaction.missing().begin()->first;
-    cerr << endl;
+    cerr << "' could not be found: " << endl;
 }
 
 void PrtGet::sysup()

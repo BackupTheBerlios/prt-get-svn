@@ -27,6 +27,9 @@ using namespace StringHelper;
 namespace VersionComparator
 {
 
+// this is a one day hack; I'll refactor that to be nicer, clearer and
+// hopefully faster. It should work pretty well though
+
 COMP_RESULT compareVersions(const string& v1, const string& v2)
 {
     vector<string> blocks1;

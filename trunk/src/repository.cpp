@@ -130,12 +130,19 @@ void Repository::initFromFS( const list< pair<string, string> >& rootList,
     DIR* d;
     struct dirent* de;
     string name;
+    
+    std::map<string, bool> alreadyChecked;
 
 
     for ( ; it != rootList.end(); ++it ) {
-
+            
         string path = it->first;
         string pkgInput = stripWhiteSpace( it->second );
+
+        if ( alreadyChecked[path] ) {
+            continue;
+        }
+        alreadyChecked[path] = true;
 
         bool filter = false;
         if ( pkgInput.length() > 0 ) {

@@ -692,10 +692,11 @@ void PrtGet::printDiff()
 
             if ( greaterThan( p->version() + "-" + p->release(),
                               it->second ) ) {
-                if ( !m_locker.isLocked( it->first ) ||
+                if ( !m_locker.isLocked( it->first )  ||
+                     m_parser->otherArgs().size() > 0 ||
                      m_parser->all() ) {
 
-                
+
                     ++count;
                     if ( count == 1 ) {
                         cout << "Differences between installed packages "
@@ -1047,7 +1048,7 @@ void PrtGet::printf()
 
     map<string, string>::iterator sortIt = sortedOutput.begin();
     for ( ; sortIt != sortedOutput.end(); ++sortIt ) {
-        if ( sortIt->second.length() > 0 ) {
+        if ( StringHelper::stripWhiteSpace(sortIt->second).length() > 0) {
             cout << sortIt->second;
         }
     }

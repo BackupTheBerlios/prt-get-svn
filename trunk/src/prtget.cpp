@@ -102,7 +102,7 @@ void PrtGet::printUsage()
     cout << "  readme   <port>            show a port's readme file "
          << "(if it exists)" << endl;
     cout << "  diff     <port1 port2...>  list outdated packages (or check "
-         << "args for change) "
+         << "args for change); use --all switch to display locked "
          << endl;
     cout << "  quickdiff                  same as diff but simple format"
          << endl;
@@ -145,12 +145,12 @@ void PrtGet::printUsage()
          << endl;
     cout << "                --test              test mode" << endl;
     cout << "                --log               write log file"<< endl;
-    cout << "                --pre-install       execute pre-install script" 
+    cout << "                --pre-install       execute pre-install script"
          << endl;
-    cout << "                --post-install      execute post-install script" 
+    cout << "                --post-install      execute post-install script"
          << endl;
-    cout << "                --install-scripts   execute " 
-         << "pre-install and post-install script" 
+    cout << "                --install-scripts   execute "
+         << "pre-install and post-install script"
          << endl;
 
     cout << "\nSYSTEM UPDATE " << endl;
@@ -692,38 +692,43 @@ void PrtGet::printDiff()
 
             if ( greaterThan( p->version() + "-" + p->release(),
                               it->second ) ) {
-                ++count;
-                if ( count == 1 ) {
-                    cout << "Differences between installed packages "
-                         << "and ports tree:\n" << endl;
+                if ( !m_locker.isLocked( it->first ) ||
+                     m_parser->all() ) {
+
+                
+                    ++count;
+                    if ( count == 1 ) {
+                        cout << "Differences between installed packages "
+                             << "and ports tree:\n" << endl;
+                        cout.setf( ios::left, ios::adjustfield );
+                        cout.width( 20 );
+                        cout.fill( ' ' );
+                        cout << "Ports";
+                        cout.width( 20 );
+                        cout.fill( ' ' );
+                        cout << "Installed";
+                        cout.width( 20 );
+                        cout.fill( ' ' );
+                        cout << "Available in the ports tree" << endl << endl;
+                    }
                     cout.setf( ios::left, ios::adjustfield );
                     cout.width( 20 );
                     cout.fill( ' ' );
-                    cout << "Ports";
+                    cout <<  it->first.c_str();
+
                     cout.width( 20 );
                     cout.fill( ' ' );
-                    cout << "Installed";
+                    cout << it->second.c_str();
+
+                    string locked = "";
+                    if ( m_locker.isLocked( it->first ) ) {
+                        locked = "locked";
+                    }
                     cout.width( 20 );
                     cout.fill( ' ' );
-                    cout << "Available in the ports tree" << endl << endl;
+                    cout << (p->version()+"-"+p->release()).c_str()
+                         << locked << endl;
                 }
-                cout.setf( ios::left, ios::adjustfield );
-                cout.width( 20 );
-                cout.fill( ' ' );
-                cout <<  it->first.c_str();
-
-                cout.width( 20 );
-                cout.fill( ' ' );
-                cout << it->second.c_str();
-
-                string locked = "";
-                if ( m_locker.isLocked( it->first ) ) {
-                    locked = "locked";
-                }
-                cout.width( 20 );
-                cout.fill( ' ' );
-                cout << (p->version()+"-"+p->release()).c_str()
-                     << locked << endl;
             }
         }
     }
@@ -782,13 +787,13 @@ void PrtGet::printResult( InstallTransaction& transaction,
         }
     }
 
-    const list< pair<string, InstallTransaction::InstallInfo> >& error = 
+    const list< pair<string, InstallTransaction::InstallInfo> >& error =
         transaction.installError();
     if ( error.size() ) {
         ++errors;
         cout << endl << "-- Packages where "
              << command[0] << " failed" << endl;
-        list< pair<string, InstallTransaction::InstallInfo> >::const_iterator 
+        list< pair<string, InstallTransaction::InstallInfo> >::const_iterator
             eit = error.begin();
 
         for ( ; eit != error.end(); ++eit ) {
@@ -808,13 +813,13 @@ void PrtGet::printResult( InstallTransaction& transaction,
             cout << *ait << endl;
         }
     }
-    
-    
-    const list< pair<string, InstallTransaction::InstallInfo> >& inst = 
+
+
+    const list< pair<string, InstallTransaction::InstallInfo> >& inst =
         transaction.installedPackages();
     if ( inst.size() ) {
         cout << endl << "-- Packages " << command[1] << endl;
-        list< pair<string, InstallTransaction::InstallInfo> >::const_iterator 
+        list< pair<string, InstallTransaction::InstallInfo> >::const_iterator
             iit = inst.begin();
 
         bool atLeastOnePackageHasReadme = false;
@@ -860,14 +865,14 @@ void PrtGet::reportPrePost(const InstallTransaction::InstallInfo& info) {
         string preString = "failed";
         if (info.preState == InstallTransaction::EXEC_SUCCESS) {
             preString = "ok";
-        }   
+        }
         cout << " [pre: " << preString << "]";
     }
     if ( info.postState != InstallTransaction::NONEXISTENT) {
         string postString = "failed";
         if (info.postState == InstallTransaction::EXEC_SUCCESS){
             postString = "ok";
-        }   
+        }
         cout << " [post: " << postString << "]";
     }
 
@@ -1491,7 +1496,7 @@ void PrtGet::remove()
     if ( m_parser->isTest() ) {
         cout << "*** " << m_appName << ": test mode" << endl;
     }
-    
+
     const list<char*>& args = m_parser->otherArgs();
     list<char*>::const_iterator it = args.begin();
     for ( ; it != args.end(); ++it ) {
@@ -1536,7 +1541,7 @@ void PrtGet::remove()
             cout << *it << endl;
         }
     }
-    
+
     if ( m_parser->isTest() ) {
         cout << "*** " << m_appName << ": test mode end" << endl;
     }

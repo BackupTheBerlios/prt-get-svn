@@ -1,6 +1,7 @@
 * 0.5.2         01.09.2003  Johannes Winkelmann
 - Add 'remove' feature
 - implement pre/post install execution
+- prt-get diff doesn't display locked; use --all if you want them
 
 * 0.5.1a	08.08.2003  Johannes Winkelmann
 - Fix for gcc 3.3

@@ -120,13 +120,14 @@ also includes the description from the Pkgfile. Note that the
 switch will slow down the operation remarkably.
 
 .TP 
-.B diff [<package1> <package2> ...]
+.B diff [--all] [<package1> <package2> ...]
 show differences between installed packages and ports in the ports
 tree. If arguments are given, shows only differences for these
 packages, otherwise all differences are shown. It's also possible to use
 shell like
 .B wildcards
-for the diff command. Make sure you escape where needed.
+for the diff command. Make sure you escape where needed. Locked packages
+are only displayed if you use the --all switch
 
 .TP 
 .B quickdiff

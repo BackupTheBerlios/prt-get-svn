@@ -41,7 +41,7 @@ search within the ports
 
 .PP 
 
-What prt\-get basically does installing and upgrading packages, using
+What prt\-get basically does is installing and upgrading packages, using
 pkgmk and pkgadd. Additionally, you don't have be in the port's
 directory to call prt\-get. prt\-get will search for the respective port
 itself in a list of directories specified in /etc/prt\-get.conf. This
@@ -74,12 +74,12 @@ argument passed. This is very similar to
 
 
 .TP 
-.B install [\-\-margs] [\-\-aargs] [\-\-log]] <package1> [<package2> ...]
+.B install [\-\-margs] [\-\-aargs] [\-\-log] <package1> [<package2> ...]
 install all packages in the listed order. Note that you can do this
 from any directory
 
 .TP 
-.B depinst [\-\-margs] [\-\-aargs] [\-\-log]] <package1> [<package2> ...]
+.B depinst [\-\-margs] [\-\-aargs] [\-\-log] <package1> [<package2> ...]
 install all packages in the listed order including their dependencies.
 Note that outdated packages won't be updated.
 
@@ -91,7 +91,7 @@ depends on package1
 
 .TP 
 .B update [\-\-margs] [\-\-aargs]  [\-\-log] <package1> [<package2> ...]
-install all packages listed in this order
+update all packages listed in this order
 
 .TP 
 .B remove <package1> [<package2> ...]
@@ -250,7 +250,7 @@ are replaced like this:
 
 .TP 
 \ \ \ \(bu
-%u \-> URL,
+%u \-> URL
 
 .TP 
 \ \ \ \(bu

@@ -132,85 +132,85 @@ bool ArgParser::parse()
                                      DEPENDENT, SYSUP, CURRENT,
                                      FSEARCH, LOCK, UNLOCK, LISTLOCKED,
                                      CAT, LS, EDIT, REMOVE };
-    if ( m_argc > 1 )
-    {
-        // if called from a symlink ending on prt-cache, use cached
-        // access
-        string app = m_argv[0];
-        string::size_type pos = app.rfind( "/" );
-        if ( pos != string::npos ) {
-            app = app.substr( pos );
-        }
-        if ( app.find( "prt-cache" ) != string::npos ) {
-            m_useCache = true;
-            m_calledAsPrtCache = true;
-        }
-
-        // find the command
-        string s = m_argv[1];
-        for ( int i = 0; i < commandCount; ++i ) {
-            if ( s == commands[i] ) {
-                m_isCommandGiven = true;
-                m_commandType = commandID[i];
-                m_commandName = s;
-            }
-        }
-        if ( !m_isCommandGiven ) {
-            return false;
-        }
-
-        for ( int i = 2; i < m_argc; ++i ) {
-            if ( m_argv[i][0] == '-' ) {
-                string s = m_argv[i];
-                if ( s == "-v" ) {
-                    m_verbose += 1;
-                } else if ( s == "-vv" ) {
-                    m_verbose += 2;
-                } else if ( s == "--force" ) {
-                    m_isForced = true;
-                } else if ( s == "--test" ) {
-                    m_isTest = true;
-                } else if ( s == "--cache" ) {
-                    m_useCache = true;
-                } else if ( s == "--nodeps" ) {
-                    m_nodeps = true;
-                } else if ( s == "--all" ) {
-                    m_all = true;
-                } else if ( s == "--log" ) {
-                    m_writeLog = true;
-                } else if ( s == "--pre-install" ) {
-                    m_execPreInstall = true;
-                } else if ( s == "--post-install" ) {
-                    m_execPostInstall = true;
-                } else if ( s == "--install-scripts" ) {
-                    m_execPreInstall = true;
-                    m_execPostInstall = true;
-                }
-
-                // substrings
-                else if ( s.substr( 0, 8 )  == "--margs=" ) {
-                    m_pkgmkArgs = s.substr( 8 );
-                } else if ( s.substr( 0, 8 ) == "--aargs=" ) {
-                    m_pkgaddArgs = s.substr( 8 );
-                } else if ( s.substr( 0, 7 ) == "--sort=" ) {
-                    m_sortArgs = s.substr( 7 );
-                } else if ( s.substr( 0, 9 ) == "--filter=" ) {
-                    m_filter = s.substr( 9 );
-                    m_hasFilter = true;
-                } else if ( s.substr( 0, 9 ) == "--config=" ) {
-                    m_alternateConfigFile = s.substr( 9 );
-                    m_isAlternateConfigGiven = true;
-                } else {
-                    m_unknownOption = s;
-                    return false;
-                }
-
-            } else {
-                m_otherArgs.push_back( m_argv[i] );
-            }
-        }
+    if ( m_argc < 2 ) {
+        return false;
+    }
+    
+    // if called from a symlink ending on prt-cache, use cached
+    // access
+    string app = m_argv[0];
+    string::size_type pos = app.rfind( "/" );
+    if ( pos != string::npos ) {
+        app = app.substr( pos );
+    }
+    if ( app.find( "prt-cache" ) != string::npos ) {
+        m_useCache = true;
+        m_calledAsPrtCache = true;
     }
 
+    // find the command
+    string s = m_argv[1];
+    for ( int i = 0; i < commandCount; ++i ) {
+        if ( s == commands[i] ) {
+            m_isCommandGiven = true;
+            m_commandType = commandID[i];
+            m_commandName = s;
+        }
+    }
+    if ( !m_isCommandGiven ) {
+        return false;
+    }
+
+    for ( int i = 2; i < m_argc; ++i ) {
+        if ( m_argv[i][0] == '-' ) {
+            string s = m_argv[i];
+            if ( s == "-v" ) {
+                m_verbose += 1;
+            } else if ( s == "-vv" ) {
+                m_verbose += 2;
+            } else if ( s == "--force" ) {
+                m_isForced = true;
+            } else if ( s == "--test" ) {
+                m_isTest = true;
+            } else if ( s == "--cache" ) {
+                m_useCache = true;
+            } else if ( s == "--nodeps" ) {
+                m_nodeps = true;
+            } else if ( s == "--all" ) {
+                m_all = true;
+            } else if ( s == "--log" ) {
+                m_writeLog = true;
+            } else if ( s == "--pre-install" ) {
+                m_execPreInstall = true;
+            } else if ( s == "--post-install" ) {
+                m_execPostInstall = true;
+            } else if ( s == "--install-scripts" ) {
+                m_execPreInstall = true;
+                m_execPostInstall = true;
+            }
+
+            // substrings
+            else if ( s.substr( 0, 8 )  == "--margs=" ) {
+                m_pkgmkArgs = s.substr( 8 );
+            } else if ( s.substr( 0, 8 ) == "--aargs=" ) {
+                m_pkgaddArgs = s.substr( 8 );
+            } else if ( s.substr( 0, 7 ) == "--sort=" ) {
+                m_sortArgs = s.substr( 7 );
+            } else if ( s.substr( 0, 9 ) == "--filter=" ) {
+                m_filter = s.substr( 9 );
+                m_hasFilter = true;
+            } else if ( s.substr( 0, 9 ) == "--config=" ) {
+                m_alternateConfigFile = s.substr( 9 );
+                m_isAlternateConfigGiven = true;
+            } else {
+                m_unknownOption = s;
+                return false;
+            }
+
+        } else {
+            m_otherArgs.push_back( m_argv[i] );
+        }
+    }
 
     return true;
 }

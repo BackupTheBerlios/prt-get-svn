@@ -189,7 +189,7 @@ bool ArgParser::parse()
 
             } else if ( s == "-f" ) {
                 m_pkgaddArgs += " " + s;
-            } else if ( s == " -fr" ) {
+            } else if ( s == "-fr" ) {
                 m_pkgmkArgs += " -f";
             } else if ( s == "-if" ) {
                 m_pkgmkArgs += " " + s;

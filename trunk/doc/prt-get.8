@@ -108,7 +108,9 @@ the --nodeps switch. Also see the
 and
 .B unlock
 commands to keep the currently installed versions, even if there are
-changes in the ports tree
+changes in the ports tree. If you want to update only diffs which have
+a lower version installed than the one in the ports tree, use the
+--prefer-higher option.
 
 .TP 
 .B lock <package1> [<package2>...]
@@ -137,15 +139,19 @@ tree. If arguments are given, shows only differences for these
 packages, otherwise all differences are shown. It's also possible to use
 shell like
 .B wildcards
-for the diff command. Make sure you escape where needed. Locked packages
-are only displayed if you use the --all switch
+for the diff command. Make sure you escape where needed. Locked
+packages are only displayed if you use the --all switch. If you want
+to see only diffs which have a lower version installed than the one in
+the ports tree, use the --prefer-higher option.
 
 .TP 
 .B quickdiff
 prints a simple list of packages which have a different version in the
 ports tree than what is installed. This is meant as an input for
 .B prt\-get update,
-so you can update all ports on your system with one simple command
+so you can update all ports on your system with one simple command. If you want
+to see only diffs which have a lower version installed than the one in
+the ports tree, use the --prefer-higher option.
 
 .TP 
 .B search [\-v|\-vv] <expr>
@@ -357,6 +363,42 @@ create a cache file from the ports tree to be used by prt\-get using the
 ports tree
 
 .SH "OPTIONS"
+
+.TP
+.B -f, -i
+Force install; Implies 'pkgadd -f'; same as --aargs=-f
+
+.TP
+.B -fr
+Force rebuild, Implies 'pkgmk -f'; same as --margs=-f
+
+.TP
+.B -um
+Update md5sum, implies 'pkgmk -um'; same as --margs=-um
+
+.TP
+.B -im
+Ignore md5sum, implies 'pkgmk -im'; same as --margs=-im
+
+.TP
+.B -uf
+Update footprint, implies 'pkgmk -uf'; same as --margs=-uf
+
+.TP
+.B -im
+Ignore footprint, implies 'pkgmk -if'; same as --margs=-if
+
+.TP
+.B -ns
+No stripping, implies 'pkgmk -ns'; same as --margs=-ns
+
+.TP
+.B -kw
+Keep working directory, implies 'pkgmk -kw'; same as --margs=-kw
+
+
+
+
 .TP 
 .B \-\-cache
 Use cache file for this command
@@ -417,6 +459,17 @@ arguments to be passed to pkgadd, relevant for
 .B \-\-rargs="..."
 arguments to be passed to pkgrm; currently not used, implemented for
 future uses and consistency reasons
+
+.TP
+.B \-\-prefer-higher, -ph
+Make prt-get parse the version strings and prefer the higher version,
+even if the one found in the ports tree is lower. Will influence diff,
+quickdiff and sysup.
+
+.TP
+.B \-\-strict-diff, -sd
+Override the 'preferhigher' configuration option
+
 
 .TP 
 .B \-\-config=<file>

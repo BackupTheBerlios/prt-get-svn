@@ -45,6 +45,9 @@ depfile /var/lib/pkg/opt.dependencies
 
 # execute pre- and post-installs scripts (default no)
 runscripts yes
+
+# don't prefer higher versions (default no)
+preferhigher yes
 .fi
 
 .LP
@@ -79,6 +82,11 @@ file is
 
 .B runscripts
 if set to yes, execute pre- and post-install scripts
+
+.B preferhigher
+if set to yes, prt-get will parse version strings and prefer the
+higher one, even if the one found in the ports tree is lower. Will
+influence diff, quickdiff and sysup
 
 .LP
 .B makecommand

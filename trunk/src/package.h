@@ -56,6 +56,8 @@ public:
     const bool hasReadme() const;
     const bool hasPreInstall() const;
     const bool hasPostInstall() const;
+    
+    void setDependencies( const std::string& dependencies );
 
 
 private:

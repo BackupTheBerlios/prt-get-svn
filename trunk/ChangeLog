@@ -1,3 +1,7 @@
+* 0.5.5		05.03.2004  Johannes Winkelmann
+- Add new configuration option: depfile
+- add way to use external dependency file
+
 * 0.5.4p2       17.11.2003  Johannes Winkelmann
 - fix bug in "at least X arguments" after getting several complaints
 

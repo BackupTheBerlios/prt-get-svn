@@ -63,8 +63,9 @@ public:
     };
     WriteResult writeCache( const string& cacheFile );
 
-    static bool createOutputDir( const string& path );
-
+    static bool createOutputDir( const string& path );    
+    void addDependencies( std::map<string, string>& deps );
+    
 private:
     static string CACHE_VERSION;
 

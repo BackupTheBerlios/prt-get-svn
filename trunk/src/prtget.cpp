@@ -381,6 +381,35 @@ void PrtGet::initRepo( bool listDuplicate )
             m_repo->initFromFS( m_config->rootList(), listDuplicate );
         }
     }
+    
+    std::string depFile = m_config->depFile();
+    if (depFile != "") {
+        FILE* depFP = fopen(depFile.c_str(), "r"); 
+        char buffer[512];
+        string input;
+        if (depFP) {
+            
+            map<string, string> depMap;
+            while (fgets(buffer, 512, depFP)) {
+                input = buffer;
+                input = stripWhiteSpace(input);
+                
+                if (input.length() > 0 && input[0] != '#') {
+                    string::size_type pos = input.find(":");
+                    if (pos != string::npos) {
+                        string deps = input.substr(pos+1);
+                        deps = StringHelper::replaceAll(deps, " ", ",");
+                        deps = StringHelper::replaceAll(deps, ",,", ",");
+                        
+                        depMap[input.substr(0, pos)] = deps;
+                    }
+                }
+            }
+            m_repo->addDependencies(depMap);
+        
+            fclose(depFP);
+        }
+    }
 }
 
 /*! print whether a package is installed or not */

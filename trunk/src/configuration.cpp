@@ -3,10 +3,10 @@
 // AUTHOR:      Johannes Winkelmann, jw@tks6.net
 // COPYRIGHT:   (c) 2002 by Johannes Winkelmann
 // ---------------------------------------------------------------------
-//  This program is free software; you can redistribute it and/or modify  
-//  it under the terms of the GNU General Public License as published by  
-//  the Free Software Foundation; either version 2 of the License, or     
-//  (at your option) any later version.                                   
+//  This program is free software; you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation; either version 2 of the License, or
+//  (at your option) any later version.
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
@@ -22,11 +22,12 @@ using namespace StringHelper;
 
 Configuration::Configuration( const std::string& configFile,
                               const ArgParser* parser )
-    : m_configFile( configFile ), 
-      m_parser( parser ), 
+    : m_configFile( configFile ),
+      m_parser( parser ),
       m_writeLog( false ),
       m_appendLog( false ),
       m_logFilePattern( "" ),
+      m_depFile( "" ),
       m_readmeMode( VERBOSE_README )
 {
 
@@ -73,6 +74,9 @@ bool Configuration::parse()
             } else if ( startwith_nocase( s, "logfile" ) ) {
                 s = stripWhiteSpace( s.replace( 0, 7, "" ) );
                 m_logFilePattern = s;
+            } else if ( startwith_nocase( s, "depfile" ) ) {
+                s = stripWhiteSpace( s.replace( 0, 7, "" ) );
+                m_depFile = s;
             } else if ( startwith_nocase( s, "logmode" ) ) {
                 s = stripWhiteSpace( s.replace( 0, 7, "" ) );
                 if ( s == "append" ) {
@@ -90,12 +94,12 @@ bool Configuration::parse()
     }
 
     fclose( fp );
-    
+
     // command line arguments override config:
     if ( m_parser->writeLog() ) {
         m_writeLog = true;
     }
-    
+
     return true;
 }
 
@@ -123,4 +127,9 @@ const list< pair<string, string> >& Configuration::rootList() const
 Configuration::ReadmeMode Configuration::readmeMode() const
 {
     return m_readmeMode;
+}
+
+std::string Configuration::depFile() const
+{
+    return m_depFile;
 }

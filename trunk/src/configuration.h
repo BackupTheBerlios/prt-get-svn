@@ -36,6 +36,8 @@ public:
 
     enum ReadmeMode { VERBOSE_README, COMPACT_README, NO_README };
     ReadmeMode readmeMode() const;
+    
+    std::string depFile() const;
 
 private:
     std::string m_configFile;
@@ -47,6 +49,7 @@ private:
     std::list< std::pair<std::string, std::string> > m_rootList;
 
     std::string m_logFilePattern;
+    std::string m_depFile;
     bool m_writeLog;
     bool m_appendLog;
 

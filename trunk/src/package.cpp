@@ -52,7 +52,7 @@ Package::Package( const string& name,
 {
     m_data = new PackageData( name, path, version, release,
                               description, dependencies, url,
-                              packager, maintainer, hasReadme, 
+                              packager, maintainer, hasReadme,
                               hasPreInstall, hasPostInstall );
 
 }
@@ -136,7 +136,7 @@ const bool Package::hasPreInstall() const
 
 const bool Package::hasPostInstall() const
 {
-    return m_data->hasPostInstall;    
+    return m_data->hasPostInstall;
 }
 
 /*!
@@ -227,7 +227,7 @@ void Package::load() const
     struct stat buf;
     if ( stat( file.c_str(), &buf ) != -1) {
         m_data->hasReadme = true;
-    }    
+    }
     file = m_data->path + "/" + m_data->name + "/pre-install";
     if ( stat( file.c_str(), &buf ) != -1) {
         m_data->hasPreInstall = true;
@@ -239,6 +239,10 @@ void Package::load() const
 
 }
 
+void Package::setDependencies( const std::string& dependencies )
+{
+    m_data->depends = dependencies;
+}
 
 
 
@@ -269,5 +273,3 @@ PackageData::PackageData( const string& name_,
     hasPreInstall = ( stripWhiteSpace( hasPreInstall_ ) == "yes" );
     hasPostInstall = ( stripWhiteSpace( hasPostInstall_ ) == "yes" );
 }
-
-

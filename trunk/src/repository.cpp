@@ -157,7 +157,7 @@ void Repository::initFromFS( const list< pair<string, string> >& rootList,
                 pkgInput = pkgInput.replace( pkgInput.find(",,"), 2, "," );
             }
         }
-        
+
         if (!filter) {
             alreadyChecked[path] = true;
         }
@@ -387,6 +387,19 @@ void Repository::getMatchingPackages( const string& pattern,
         // I didn't add a boolean to check for this explicitely
         if ( fnmatch( pattern.c_str(), it->first.c_str(), 0  ) == 0 ) {
             target.push_back( it->second );
+        }
+    }
+}
+
+void Repository::addDependencies( std::map<string, string>& deps )
+{
+    map<string, string>::iterator it = deps.begin();
+    for ( ; it != deps.end(); ++it ) {
+        map<string, Package*>::const_iterator pit = 
+            m_packageMap.find( it->first );
+        if ( pit != m_packageMap.end() ) {
+            Package* p = pit->second;
+            p->setDependencies(it->second);
         }
     }
 }

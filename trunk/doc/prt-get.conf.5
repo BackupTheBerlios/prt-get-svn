@@ -39,6 +39,9 @@ logfile /tmp/log/%n.log
 
 # show compact readme information
 readme compact
+
+# use external dependency file
+depfile /var/lib/pkg/opt.dependencies
 .fi
 
 .LP
@@ -62,7 +65,14 @@ The value for
 .B prtdir 
 is a directory, the value for
 .B cachefile
-is a file
+is a file to be used as cache
+.B depfile
+is a file which allows to specify dependencies for ports; the format of this
+file is
+
+.nf
+<portname1>|<dependency1> <dependency2>
+<portname2>|<dependency1>
 
 .LP
 The log options are

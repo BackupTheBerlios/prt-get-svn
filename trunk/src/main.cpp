@@ -153,7 +153,7 @@ int main( int argc, char** argv )
             break;
 
         default:
-            cout << "unknown command" << endl;
+            cerr << "unknown command" << endl;
             break;
     }
 

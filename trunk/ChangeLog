@@ -6,6 +6,11 @@
 - print output while logging (Patch from Logan)
 - redirect output of InstallTransaction::installPackage to log file
 - add %v (version) and %r (release) patterns to the log file name
+- fix typo in man page: %d in printf used for desc and deps
+- check for pre-install and post-install
+  - store in cache (-> cache version update)
+  - show in prt-get info
+  - enable in prt-get printf, using %E (prE) and %O (pOst)
 
 * 0.5.3p2       29.09.2003  Johannes Winkelmann
 - Fix little bug in prt-get printf: don't print out empty lines (even if

@@ -17,15 +17,17 @@
 
 0.5.x:
 
+[ ] timestamps for the log file 
 [ ] --quiet mode; suppress output of pkgmk and pkgadd
+[ ] create a separate port for the bash-completion
+
+???
 [ ] prt-get rm and cd
-[ ] create a install-info file with all packages installed to allow a
-    quick uninstall of those packages
+[ ] cache file class, help class
 [ ] interrupt handler (ctrl-c) kill pkgmk/pkgadd, delete lock files, say
     "prt-get: action cancelled"; warn when cancel during download ->
     STATE variable, separate download and build.
 [ ] lock files for log, cache (lock file class)
-[ ] cache file class, help class
 [ ] direct options for -im, -uf, -fr (force rebuild), -fi (force install)
 [ ] move command name out of execTransaction (would be wrong for e.g.
     sysup)

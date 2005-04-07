@@ -7,6 +7,7 @@
 - remove some debug test
 - prettify error message when packages are not found
 - change 'bash' to 'sh' in process.cpp
+- use 'Pkgfile' as default file for cat and edit if no second argument given
 
 * 0.5.8		31.10.2004  Johannes Winkelmann
 - re-enable version parseing; use --prefer-higher to make prt-get use

@@ -678,7 +678,7 @@ void PrtGet::printDepends( bool simpleListing )
         m_returnValue = PG_GENERAL_ERROR;
         return;
     } else if ( result == InstallTransaction::PACKAGE_NOT_FOUND ) {
-        warnPackageNotFound(transaction);        
+        warnPackageNotFound(transaction);
         m_returnValue = PG_GENERAL_ERROR;
         return;
     }
@@ -1508,7 +1508,8 @@ void PrtGet::listLocked()
 
 void PrtGet::edit()
 {
-    assertExactArgCount(2);
+    assertMinArgCount(1);
+    assertMaxArgCount(2);
 
     char* editor = getenv("EDITOR");
     if (editor) {
@@ -1518,7 +1519,11 @@ void PrtGet::edit()
         string arg = *it;
         const Package* p = m_repo->getPackage( arg );
         if ( p ) {
-            string file = p->path() + "/" + p->name() + "/" + *(++it);
+            string fileName = "Pkgfile";
+            if (++it != m_parser->otherArgs().end()) {
+                fileName = *it;
+            }
+            string file = p->path() + "/" + p->name() + "/" + fileName;
             Process proc(editor, file);
             m_returnValue = proc.executeShell();
             if (m_returnValue) {
@@ -1574,7 +1579,8 @@ void PrtGet::ls()
 
 void PrtGet::cat()
 {
-    assertExactArgCount(2);
+    assertMinArgCount(1);
+    assertMaxArgCount(2);
 
     initRepo();
 
@@ -1582,7 +1588,11 @@ void PrtGet::cat()
     string arg = *it;
     const Package* p = m_repo->getPackage( arg );
     if ( p ) {
-        string file = p->path() + "/" + p->name() + "/" + *(++it);
+        string fileName = "Pkgfile";
+        if (++it != m_parser->otherArgs().end()) {
+            fileName = *it;
+        }
+        string file = p->path() + "/" + p->name() + "/" + fileName;
         FILE* fp = fopen( file.c_str(), "r" );
         char buf[255];
         if ( fp ) {
@@ -1684,7 +1694,7 @@ void PrtGet::remove()
 
 void PrtGet::assertMaxArgCount(int count)
 {
-    if ( m_parser->otherArgs().size() > 1 ) {
+    if ( m_parser->otherArgs().size() > count ) {
         argCountFailure(count, "at most");
     }
 }

@@ -38,7 +38,7 @@ public:
                 CURRENT, FSEARCH, LOCK, UNLOCK, LISTLOCKED,
                 CAT, LS, EDIT, REMOVE,
                 DEPTREE, DUMPCONFIG };
-    
+
     bool isCommandGiven() const;
     bool isForced() const;
     bool isTest() const;
@@ -50,6 +50,7 @@ public:
     bool noStdConfig() const;
     bool nodeps() const;
     bool all() const;
+    bool path() const;
     bool execPreInstall() const;
     bool execPostInstall() const;
     bool preferHigher() const;
@@ -94,6 +95,7 @@ private:
     bool m_nodeps;
 
     bool m_all;
+    bool m_path;
 
     bool m_execPreInstall;
     bool m_execPostInstall;

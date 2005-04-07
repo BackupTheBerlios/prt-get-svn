@@ -38,6 +38,7 @@ ArgParser::ArgParser( int argc, char** argv )
       m_noStdConfig( false ),
       m_nodeps( false ),
       m_all( false ),
+      m_path( false ),
       m_execPreInstall( false ),
       m_execPostInstall( false ),
       m_preferHigher( false ),
@@ -171,6 +172,8 @@ bool ArgParser::parse()
                 m_nodeps = true;
             } else if ( s == "--all" ) {
                 m_all = true;
+            } else if ( s == "--path" ) {
+                m_path = true;
             } else if ( s == "--log" ) {
                 m_writeLog = true;
             } else if ( s == "--pre-install" ) {
@@ -363,6 +366,11 @@ bool ArgParser::nodeps() const
 bool ArgParser::all() const
 {
     return m_all;
+}
+
+bool ArgParser::path() const
+{
+    return m_path;
 }
 
 const string& ArgParser::commandName() const

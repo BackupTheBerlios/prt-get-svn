@@ -154,13 +154,13 @@ to see only diffs which have a lower version installed than the one in
 the ports tree, use the --prefer-higher option.
 
 .TP 
-.B search [\-v|\-vv] <expr>
+.B search [\-v|\-vv] [--path]<expr>
 Search the ports tree for
 .B expr
 in their name
 
 .TP 
-.B dsearch [\-v|\-vv] <expr>
+.B dsearch [\-v|\-vv] [--path]<expr>
 Search the ports tree for
 .B expr
 in both name and description. The search in the description is not case
@@ -225,7 +225,7 @@ List ports which can be found in multiple directories configured in
 
 
 .TP 
-.B list [\-v|\-vv] [filter]
+.B list [\-v|\-vv] [filter] [--path]
 List ports available in the ports tree. It's basically the same as
 .B ports \-l
 but looks in all directories specified in
@@ -336,12 +336,13 @@ Prints out the version of the currently installed package
 Prints out a listing of the port's directory
 
 .TP
-.B cat <package> <file>
-Prints out the file to stdout
+.B cat <package> [<file>]
+Prints out the file to stdout. If <file> is not specified, 'Pkgfile' is used
 
 .TP
 .B edit <package> <file>
-Edit the file using the editor specified in the $EDITOR environment variable
+Edit the file using the editor specified in the $EDITOR environment variable.
+If <file> is not specified, 'Pkgfile' is used
 
 
 .TP 
@@ -443,6 +444,9 @@ verbose and more verbose, relevant for
 .B prt\-get search, prt\-get list
 verbose shows version of a port, more verbose shows version and
 description (if available)
+
+.B \-\-path
+Show path info; used in 'search', 'dsearch' and 'info'
 
 .TP 
 .B \-\-margs="...", e.g. \-\-margs="\-im"

@@ -284,6 +284,10 @@ void PrtGet::listPackages()
             if ( m_parser->verbose() > 1 && !(*it)->description().empty() ) {
                 cout << ": " << (*it)->description();
             }
+            if ( m_parser->path() ) {
+                cout << " @ " << (*it)->path();
+            }
+
             cout << endl;
         }
     } else {
@@ -314,6 +318,10 @@ void PrtGet::searchPackages( bool searchDesc )
             }
             if ( m_parser->verbose() > 1 && !(*it)->description().empty() ) {
                 cout << ": " << (*it)->description();
+            }
+            
+            if ( m_parser->path()) {
+                cout << " @ " << (*it)->path();
             }
             cout << endl;
         }
@@ -516,6 +524,7 @@ void PrtGet::listInstalled()
                 cout << " " << p->description();
             }
         }
+        
         cout << endl;
     }
 }
@@ -1244,6 +1253,7 @@ void PrtGet::printDependendent()
             if ( m_parser->verbose() > 1 ) {
                 cout << ":  " << p->description();
             }
+            
             cout << endl;
         }
     }

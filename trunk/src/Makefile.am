@@ -20,7 +20,7 @@ prt_get_SOURCES= argparser.cpp argparser.h\
 		 versioncomparator.cpp versioncomparator.h \
 		 datafileparser.cpp datafileparser.h
 
-EXTRA_DIST = prt-get.conf aliases
+EXTRA_DIST = prt-get.conf
 
 install-data-local: install-binPROGRAMS
 	(cd $(DESTDIR)$(bindir); ln -sf prt-get prt-cache)

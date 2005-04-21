@@ -1,4 +1,8 @@
-* 0.5.9         06.12.2004  Johannes Winkelmann
+* 0.5.10	21.04.2005  Johannes WInkelmann
+- fix bugs #3735, #3836
+
+
+* 0.5.9         06.12.2005  Johannes Winkelmann
 - add alias support
 - use absolut pathes for commands (pkgmk et al)
 - add -v switch to 'info' to show the readme

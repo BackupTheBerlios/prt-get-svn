@@ -204,6 +204,7 @@ void PrtGet::printUsage()
          << endl;
 
     cout << "\nFILE OPERATIONS " << endl;
+    
     cout << "  ls <port>                         print a listing of the port's"
          << " directory" << endl;
     cout << "  cat <port> <file>                 print out 'port/file'"
@@ -211,15 +212,16 @@ void PrtGet::printUsage()
     cout << "  edit <port> <file>                edit 'port/file'" << endl;
 
     cout << "\nGENERAL OPTIONS" << endl;
+    cout << "                -v                 Show version in listing"
+         << endl;
+    cout << "                -vv                Show version and decription "          << "in listing\n" << endl;
     cout << "                --cache             Use a cache file" << endl;
     cout << "                --config=<file>     Use alternative "
          << "configuration file" << endl;
     cout << "                --install-root=..   Use alternative "
          << "install root directory" << endl;
 
-    cout << "                --v                 Show version in listing"
-         << endl;
-    cout << "                --vv                Show version and decription "          << "in listing" << endl;
+
 
 
     cout << "                --no-std-config     Don't parse "
@@ -319,7 +321,7 @@ void PrtGet::searchPackages( bool searchDesc )
             if ( m_parser->verbose() > 1 && !(*it)->description().empty() ) {
                 cout << ": " << (*it)->description();
             }
-            
+
             if ( m_parser->path()) {
                 cout << " @ " << (*it)->path();
             }
@@ -482,7 +484,6 @@ void PrtGet::isInstalled()
         } else {
             cout << "package " << *it << " is not installed" << endl;
             m_returnValue = PG_GENERAL_ERROR;
-            return;
         }
     }
 }
@@ -524,7 +525,7 @@ void PrtGet::listInstalled()
                 cout << " " << p->description();
             }
         }
-        
+
         cout << endl;
     }
 }
@@ -1253,7 +1254,7 @@ void PrtGet::printDependendent()
             if ( m_parser->verbose() > 1 ) {
                 cout << ":  " << p->description();
             }
-            
+
             cout << endl;
         }
     }

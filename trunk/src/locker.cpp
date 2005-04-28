@@ -43,11 +43,10 @@ Locker::Locker()
 
 bool Locker::store()
 {
-    // TODO: create if it doesn't exists
     if ( !Repository::createOutputDir(LOCKER_FILE_PATH) ) {
         return false;
     }
-    
+
     string fName = LOCKER_FILE_PATH + LOCKER_FILE;
     FILE* fp = fopen( fName.c_str(), "w" );
     if ( fp ) {

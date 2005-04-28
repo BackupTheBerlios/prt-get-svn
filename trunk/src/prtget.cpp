@@ -279,15 +279,15 @@ void PrtGet::listPackages()
     if ( packages.size() ) {
         list<Package*>::iterator it = packages.begin();
         for ( ; it != packages.end(); ++it ) {
+            if ( m_parser->printPath() ) {
+                cout << (*it)->path() << "/";
+            }
             cout << (*it)->name();
             if ( m_parser->verbose() > 0 ) {
                 cout << " " << (*it)->version() << "-" << (*it)->release();
             }
             if ( m_parser->verbose() > 1 && !(*it)->description().empty() ) {
                 cout << ": " << (*it)->description();
-            }
-            if ( m_parser->path() ) {
-                cout << " @ " << (*it)->path();
             }
 
             cout << endl;
@@ -314,7 +314,11 @@ void PrtGet::searchPackages( bool searchDesc )
     if ( packages.size() ) {
         list<Package*>::iterator it = packages.begin();
         for ( ; it != packages.end(); ++it ) {
+            if ( m_parser->printPath()) {
+                cout << (*it)->path() << "/";
+            }
             cout << (*it)->name();
+            
             if ( m_parser->verbose() > 0 ) {
                 cout << " " << (*it)->version() << "-" << (*it)->release();
             }
@@ -322,9 +326,7 @@ void PrtGet::searchPackages( bool searchDesc )
                 cout << ": " << (*it)->description();
             }
 
-            if ( m_parser->path()) {
-                cout << " @ " << (*it)->path();
-            }
+        
             cout << endl;
         }
     } else {
@@ -716,7 +718,11 @@ void PrtGet::printDepends( bool simpleListing )
                 } else {
                     cout << "[ ] ";
                 }
+                if (m_parser->printPath() > 0) {
+                    cout << m_repo->getPackage(*it)->path() << "/";
+                }
                 cout << *it;
+                
                 if (isAlias) {
                     cout << " (provided by " << provider << ")";
                 }

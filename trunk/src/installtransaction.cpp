@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <iostream>
 #include <algorithm>
+#include <list>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -108,10 +109,21 @@ InstallTransaction::install( const ArgParser* parser,
     if ( m_packages.empty() ) {
         return NO_PACKAGE_GIVEN;
     }
+    
+    list<string> ignoredPackages;
+    StringHelper::split(parser->ignore(), ',', ignoredPackages);
 
     list< pair<string, const Package*> >::iterator it = m_packages.begin();
     for ( ; it != m_packages.end(); ++it ) {
         const Package* package = it->second;
+        
+        if (find(ignoredPackages.begin(), 
+                 ignoredPackages.end(), 
+                 it->first) != ignoredPackages.end() ) {
+            m_ignoredPackages.push_back(it->first);
+            continue;
+        }
+        
         if ( package == NULL ) {
             m_missingPackages.push_back( make_pair( it->first, string("") ) );
             if ( group ) {
@@ -349,7 +361,7 @@ bool InstallTransaction::calculateDependencies()
     if ( m_packages.empty() ) {
         return false;
     }
-    
+
     list< pair<string, const Package*> >::const_iterator it =
         m_packages.begin();
     for ( ; it != m_packages.end(); ++it ) {
@@ -519,4 +531,9 @@ string InstallTransaction::getPkgDest()
         pclose( p );
     }
     return pkgdest;
+}
+
+const list<string>& InstallTransaction::ignoredPackages() const
+{
+    return m_ignoredPackages;
 }

@@ -204,7 +204,7 @@ void PrtGet::printUsage()
          << endl;
 
     cout << "\nFILE OPERATIONS " << endl;
-    
+
     cout << "  ls <port>                         print a listing of the port's"
          << " directory" << endl;
     cout << "  cat <port> <file>                 print out 'port/file'"
@@ -924,6 +924,17 @@ void PrtGet::evaluateResult( InstallTransaction& transaction,
         command[0] = "update";
         command[1] = "updated";
     }
+
+    const list<string>& ignored = transaction.ignoredPackages();
+    if ( ignored.size() ) {
+        cout << endl << "-- Packages ignored" << endl;
+        list<string>::const_iterator iit = ignored.begin();
+
+        for ( ; iit != ignored.end(); ++iit ) {
+            cout << *iit << endl;
+        }
+    }
+
 
     const list< pair<string, string> >& missing = transaction.missing();
     if ( missing.size() ) {

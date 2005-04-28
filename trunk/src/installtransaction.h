@@ -41,7 +41,7 @@ public:
                         const Repository* repo,
                         PkgDB* pkgDB,
                         const Configuration* config );
-    
+
     static const std::string PKGMK_DEFAULT_COMMAND;
     static const std::string PKGADD_DEFAULT_COMMAND;
     static const std::string PKGRM_DEFAULT_COMMAND;
@@ -87,6 +87,7 @@ public:
 
     const list< pair<string, InstallInfo> >& installedPackages() const;
     const list<string>& alreadyInstalledPackages() const;
+    const list<string>& ignoredPackages() const;
 
 
     const list<string>& dependencies() const;
@@ -120,6 +121,10 @@ private:
     // packages which were requested to be installed which where already
     list<string> m_alreadyInstalledPackages;
 
+    // packages which are required by the transaction, but ignored by
+    // the user
+    list<string> m_ignoredPackages;
+
     list<string> m_depNameList;
     vector<string> m_depList;
 
@@ -131,7 +136,7 @@ private:
 
     /// prt-get itself
     const Configuration* m_config;
-    
+
 };
 
 #endif /* _INSTALLTRANSACTION_H_ */

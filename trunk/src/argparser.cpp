@@ -30,6 +30,7 @@ ArgParser::ArgParser( int argc, char** argv )
       m_pkgaddArgs( "" ),
       m_pkgrmArgs( "" ),
       m_installRoot( "" ),
+      m_ignore( "" ),
       m_argc( argc ),
       m_argv( argv ),
       m_verbose( 0 ),
@@ -235,6 +236,8 @@ bool ArgParser::parse()
                 m_configData.push_back(make_pair(m_argv[i]+13, CONFIG_SET ) );
             } else if ( s.substr( 0, 15 ) == "--install-root=" ) {
                 m_installRoot = s.substr(15);
+            } else if ( s.substr( 0, 9 ) == "--ignore=" ) {
+                m_ignore = s.substr(9);
             } else {
                 m_unknownOption = s;
                 return false;
@@ -417,4 +420,10 @@ bool ArgParser::preferHigher() const
 bool ArgParser::strictDiff() const
 {
     return m_strictDiff;
+}
+
+
+const string& ArgParser::ignore() const
+{
+    return m_ignore;
 }

@@ -63,6 +63,7 @@ public:
     const string& sortArgs() const;
     const string& filter() const;
     const string& installRoot() const;
+    const string& ignore() const;
 
 
     Type commandType() const;
@@ -111,6 +112,7 @@ private:
     string m_commandName;
     string m_unknownOption;
     string m_installRoot;
+    string m_ignore;
 
     Type m_commandType;
 

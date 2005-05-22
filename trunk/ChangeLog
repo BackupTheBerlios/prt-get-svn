@@ -3,6 +3,7 @@
 - implement --ignore=<port1>,<port2> feature
 - fix --path for list, search
 - add --path for depends
+- enable logfile and depfile in default prt-get.conf
 
 
 * 0.5.9         06.12.2005  Johannes Winkelmann

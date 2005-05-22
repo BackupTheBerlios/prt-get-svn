@@ -172,6 +172,8 @@ void PrtGet::printUsage()
          << endl;
     cout << "                --test              test mode" << endl;
     cout << "                --log               write log file"<< endl;
+    cout << "                --ignore=<package1,package2,...>" << endl
+         << "                                    Don't install/update those packages"<< endl;
     cout << "                --pre-install       execute pre-install script"
          << endl;
     cout << "                --post-install      execute post-install script"
@@ -215,6 +217,7 @@ void PrtGet::printUsage()
     cout << "                -v                 Show version in listing"
          << endl;
     cout << "                -vv                Show version and decription "          << "in listing\n" << endl;
+    cout << "                --path             Print path to port if appropriate (search, list, depends)\n" << endl;
     cout << "                --cache             Use a cache file" << endl;
     cout << "                --config=<file>     Use alternative "
          << "configuration file" << endl;
@@ -318,7 +321,7 @@ void PrtGet::searchPackages( bool searchDesc )
                 cout << (*it)->path() << "/";
             }
             cout << (*it)->name();
-            
+
             if ( m_parser->verbose() > 0 ) {
                 cout << " " << (*it)->version() << "-" << (*it)->release();
             }
@@ -326,7 +329,7 @@ void PrtGet::searchPackages( bool searchDesc )
                 cout << ": " << (*it)->description();
             }
 
-        
+
             cout << endl;
         }
     } else {
@@ -457,9 +460,6 @@ void PrtGet::initRepo( bool listDuplicate )
         map<string, string> depMap;
         if (DataFileParser::parse(depFile, depMap)) {
             m_repo->addDependencies(depMap);
-        } else {
-            cerr << "Warning: Failed to open dependency file "
-                 << depFile << endl;
         }
     }
 }
@@ -722,7 +722,7 @@ void PrtGet::printDepends( bool simpleListing )
                     cout << m_repo->getPackage(*it)->path() << "/";
                 }
                 cout << *it;
-                
+
                 if (isAlias) {
                     cout << " (provided by " << provider << ")";
                 }

@@ -397,7 +397,9 @@ No stripping, implies 'pkgmk -ns'; same as --margs=-ns
 .B -kw
 Keep working directory, implies 'pkgmk -kw'; same as --margs=-kw
 
-
+.TP
+.B --ignore=<package1,package2,...>
+Don't install those packages, even if they're listed as dependency
 
 
 .TP 
@@ -446,7 +448,7 @@ verbose shows version of a port, more verbose shows version and
 description (if available)
 
 .B \-\-path
-Show path info; used in 'search', 'dsearch' and 'info'
+Show path info; used in 'search', 'dsearch', 'list' and 'depends'
 
 .TP 
 .B \-\-margs="...", e.g. \-\-margs="\-im"

@@ -1596,6 +1596,9 @@ void PrtGet::ls()
         sort(files.begin(), files.end());
         vector<string>::iterator fit = files.begin();
         for (; fit != files.end(); ++fit) {
+            if (m_parser->printPath()) {
+                cout << p->path() + "/" +p->name() + "/";
+            }
             cout << *fit << endl;
         }
     } else {

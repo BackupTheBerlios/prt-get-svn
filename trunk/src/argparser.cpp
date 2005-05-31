@@ -43,7 +43,9 @@ ArgParser::ArgParser( int argc, char** argv )
       m_execPreInstall( false ),
       m_execPostInstall( false ),
       m_preferHigher( false ),
-      m_strictDiff( false )
+      m_strictDiff( false ),
+      m_useRegex(false),
+      m_fullPath(false)
 {
 }
 
@@ -190,6 +192,10 @@ bool ArgParser::parse()
                 m_preferHigher = true;
             } else if ( s == "--strict-diff" || s == "-sd" ) {
                 m_strictDiff = true;
+            } else if ( s == "--regex" ) {
+                m_useRegex = true;
+            } else if ( s == "--full" ) {
+                m_fullPath = true;
 
             } else if ( s == "-f" ) {
                 m_pkgaddArgs += " " + s;
@@ -420,6 +426,16 @@ bool ArgParser::preferHigher() const
 bool ArgParser::strictDiff() const
 {
     return m_strictDiff;
+}
+
+bool ArgParser::useRegex() const
+{
+    return m_useRegex;
+}
+
+bool ArgParser::fullPath() const
+{
+    return m_fullPath;
 }
 
 

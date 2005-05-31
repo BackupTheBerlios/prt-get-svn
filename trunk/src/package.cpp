@@ -13,6 +13,7 @@
 #include <iostream>
 #include <cstdio>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 using namespace std;
 
 #include "package.h"
@@ -161,6 +162,11 @@ void Package::load() const
     const int length = BUFSIZ;
     char input[length];
     string line;
+    
+    struct utsname unameBuf;
+    time_t timeNow;
+    time(&timeNow);
+    bool unameAvailable = uname(&unameBuf) == 0;
 
     while ( fgets( input, length, fp ) ) {
 
@@ -169,6 +175,31 @@ void Package::load() const
         if ( line.substr( 0, 8 ) == "version=" ) {
             m_data->version = getValueBefore( getValue( line, '=' ), '#' );
             m_data->version = stripWhiteSpace( m_data->version );
+            
+            if (unameAvailable) {
+                m_data->version = replaceAll(m_data->version, 
+                                             "`uname -r`", 
+                                             unameBuf.release);
+            }
+            
+            string::size_type pos = m_data->version.find("`date");
+            if (pos != string::npos) {
+                
+                // TODO: currently only works for one date pattern
+                string::size_type startpos, endpos;
+                endpos = m_data->version.find('`', pos+1);
+                startpos = m_data->version.find('+', pos+1);
+                char timeBuf[32];
+                strftime(timeBuf, 32, 
+                         m_data->version.substr(startpos+1, 
+                                                endpos-startpos-1).c_str(), 
+                         localtime(&timeNow));
+                
+                m_data->version = m_data->version.substr(0, pos) + 
+                    timeBuf + 
+                    m_data->version.substr(endpos+1);
+            }
+                                         
         } else if ( line.substr( 0, 8 ) == "release=" ) {
             m_data->release = getValueBefore( getValue( line, '=' ), '#' );
             m_data->release = stripWhiteSpace( m_data->release );

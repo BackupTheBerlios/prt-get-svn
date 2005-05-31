@@ -62,7 +62,10 @@ PrtGet::PrtGet( const ArgParser* parser )
     }
 
 
-    m_pkgDB = new PkgDB( m_parser->installRoot() );
+    m_pkgDB = new PkgDB(m_parser->installRoot());
+    readConfig();
+    
+    m_useRegex = m_config->useRegex() || m_parser->useRegex();
 }
 
 /*! destruct PrtGet object */
@@ -407,9 +410,8 @@ void PrtGet::printInfo()
  */
 void PrtGet::initRepo( bool listDuplicate )
 {
-    readConfig();
     if ( !m_repo ) {
-        m_repo = new Repository();
+        m_repo = new Repository(m_useRegex);
 
         if ( m_parser->useCache() ) {
             if (m_config->cacheFile() != "") {
@@ -502,7 +504,7 @@ void PrtGet::listInstalled()
     }
 
     map<string, string> l;
-    m_pkgDB->getMatchingPackages( arg, l );
+    m_pkgDB->getMatchingPackages( arg, l, m_useRegex );
     map<string, string>::iterator it = l.begin();
 
     if ( l.empty() && m_parser->otherArgs().size() > 0 ) {
@@ -1070,7 +1072,6 @@ void PrtGet::createCache()
     }
 
     initRepo();
-    readConfig();
     if (m_config->cacheFile() != "") {
         m_cacheFile = m_config->cacheFile();
     }
@@ -1359,7 +1360,7 @@ void PrtGet::expandWildcardsPkgDB( const list<char*>& in,
     list<char*>::const_iterator it = in.begin();
     for ( ; it != in.end(); ++it ) {
         map<string, string> l;
-        m_pkgDB->getMatchingPackages( *it, l );
+        m_pkgDB->getMatchingPackages( *it, l, m_useRegex );
         map<string, string>::iterator iit = l.begin();
         for ( ; iit != l.end(); ++iit ) {
             target[iit->first] = iit->second;
@@ -1435,7 +1436,9 @@ void PrtGet::fsearch()
         string fp =
             it->second->path() + "/" +
             it->second->name() + "/" + ".footprint";
-        if ( File::grep( fp, arg, matches ) ) {
+        if ( File::grep( fp, arg, matches, 
+                         m_parser->fullPath(), 
+                         m_useRegex)) {
             if ( matches.size() > 0 ) {
                 if ( first ) {
                     first = false;
@@ -1648,8 +1651,6 @@ void PrtGet::remove()
 {
     assertMinArgCount(1);
 
-    readConfig();
-
     list<string> removed;
     list<string> failed;
     list<string> notInstalled;
@@ -1827,8 +1828,6 @@ void PrtGet::printDepsLevel(int indent, const Package* package)
 
 void PrtGet::dumpConfig()
 {
-    readConfig();
-
     if (!m_parser->noStdConfig()) {
         string fName = CONF_FILE;
         if ( m_parser->isAlternateConfigGiven() ) {

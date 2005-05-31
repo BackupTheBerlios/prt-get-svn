@@ -25,6 +25,7 @@ using namespace std;
 
 #include "repository.h"
 #include "stringhelper.h"
+#include "pg_regex.h"
 using namespace StringHelper;
 
 
@@ -33,7 +34,8 @@ string Repository::CACHE_VERSION = "V5";
 /*!
   Create a repository
 */
-Repository::Repository()
+Repository::Repository(bool useRegex)
+    : m_useRegex(useRegex)
 {
 }
 
@@ -100,17 +102,29 @@ void Repository::searchMatchingPackages( const string& pattern,
                                          bool searchDesc ) const
     // note: searchDesc true will read _every_ Pkgfile
 {
-
     map<string, Package*>::const_iterator it = m_packageMap.begin();
-    for ( ; it != m_packageMap.end(); ++it ) {
-        if ( it->first.find( pattern ) != string::npos ) {
-            target.push_back( it->second );
-        } else if ( searchDesc ) {
-            string s = toLowerCase( it->second->description() );
-            if ( s.find( toLowerCase( pattern ) ) != string::npos ) {
+    if (m_useRegex) {
+        RegEx re(pattern);
+        for ( ; it != m_packageMap.end(); ++it ) {
+            if (re.match(it->first)) {
                 target.push_back( it->second );
+            } else if ( searchDesc ) {
+                if ( re.match(it->second->description())) {
+                    target.push_back( it->second );
+                }
             }
         }
+    } else {
+        for ( ; it != m_packageMap.end(); ++it ) {
+            if ( it->first.find( pattern ) != string::npos ) {
+                target.push_back( it->second );
+            } else if (searchDesc ) {
+                string s = toLowerCase( it->second->description() );
+                if ( s.find( toLowerCase( pattern ) ) != string::npos ) {
+                    target.push_back( it->second );
+                }
+            }   
+        }    
     }
 }
 
@@ -381,12 +395,21 @@ void Repository::getMatchingPackages( const string& pattern,
                                       list<Package*>& target ) const
 {
     map<string, Package*>::const_iterator it = m_packageMap.begin();
-    for ( ; it != m_packageMap.end(); ++it ) {
+    RegEx re(pattern);
 
-        // I assume fnmatch will be quite fast for "match all" (*), so
-        // I didn't add a boolean to check for this explicitely
-        if ( fnmatch( pattern.c_str(), it->first.c_str(), 0  ) == 0 ) {
-            target.push_back( it->second );
+    if (m_useRegex) {
+        for ( ; it != m_packageMap.end(); ++it ) {
+            if (re.match(it->first)) {
+                target.push_back( it->second );
+            }
+        }
+    } else {
+        for ( ; it != m_packageMap.end(); ++it ) {
+            // I assume fnmatch will be quite fast for "match all" (*), so
+            // I didn't add a boolean to check for this explicitely
+            if ( fnmatch( pattern.c_str(), it->first.c_str(), 0  ) == 0 ) {
+                target.push_back( it->second );
+            }
         }
     }
 }

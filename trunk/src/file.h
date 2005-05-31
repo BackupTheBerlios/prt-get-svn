@@ -21,7 +21,9 @@ namespace File
 bool fileExists( const std::string& fileName );
 bool grep( const std::string& fileName,
            const std::string& pattern,
-           std::list<string>& result );
+           std::list<string>& result,
+           bool fullPath,
+           bool useRegex);
 
 }
 

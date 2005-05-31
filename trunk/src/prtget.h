@@ -115,7 +115,7 @@ protected:
                               list<string>& target );
 
     void warnPackageNotFound(InstallTransaction& transaction);
-        
+
     Repository* m_repo;
     PkgDB* m_pkgDB;
     Configuration* m_config;
@@ -128,6 +128,8 @@ protected:
     string m_cacheFile;
 
     int m_returnValue;
+    
+    bool m_useRegex;
 
     /*! Name of default configuration file */
     static const string CONF_FILE;

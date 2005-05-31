@@ -32,6 +32,7 @@ Configuration::Configuration( const std::string& configFile,
       m_readmeMode( VERBOSE_README ),
       m_runScripts( false ),
       m_preferHigher( false ),
+      m_useRegex( false ),
       m_makeCommand( "" ), m_addCommand( "" ),
       m_removeCommand( "" ), m_runscriptCommand( "" )
 {
@@ -180,6 +181,11 @@ void Configuration::parseLine(const string& line, bool prepend)
         if ( s == "yes" ) {
             m_preferHigher = true;
         }
+    } else if ( startwith_nocase( s, "useregex" ) ) {
+        s = stripWhiteSpace( s.replace( 0, 8, "" ) );
+        if ( s == "yes" ) {
+            m_useRegex = true;
+        }
     } else if ( startwith_nocase( s, "makecommand" ) ) {
         m_makeCommand = stripWhiteSpace( s.replace( 0, 11, "" ) );
     } else if ( startwith_nocase( s, "addcommand" ) ) {
@@ -220,3 +226,10 @@ bool Configuration::preferHigher() const
 {
     return m_preferHigher;
 }
+
+bool Configuration::useRegex() const
+{
+    return m_useRegex;
+}
+
+

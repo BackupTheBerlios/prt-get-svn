@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <fstream>
 #include <map>
+#include <iostream>
 using namespace std;
 
 #include <cstring>
@@ -21,6 +22,7 @@ using namespace std;
 
 #include "pkgdb.h"
 #include "datafileparser.h"
+#include "pg_regex.h"
 
 
 const string PkgDB::PKGDB = "/var/lib/pkg/db";
@@ -41,10 +43,10 @@ PkgDB::PkgDB( const string& installRoot )
   \param name the name of the package to check
   \param isAlias whether a package is installed as alias
   \param aliasOriginalName the original name of an aliased package
-  
+
   \return whether package \a name is installed
 */
-bool PkgDB::isInstalled( const string& name, 
+bool PkgDB::isInstalled( const string& name,
                          bool useAlias,
                          bool* isAlias,
                          string* aliasOrignalName ) const
@@ -60,7 +62,7 @@ bool PkgDB::isInstalled( const string& name,
 
         if (isAlias) {
             *isAlias = installed;
-            
+
             if (installed && aliasOrignalName) {
                 *aliasOrignalName = provider;
             }
@@ -80,7 +82,7 @@ bool PkgDB::aliasExistsFor(const string& name, string& providerName) const
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -117,7 +119,7 @@ bool PkgDB::load() const
 
     std::map<std::string, std::string> aliases;
     DataFileParser::parse(ALIAS_STORE, aliases);
-        
+
     const int length = 256;
     char line[length];
     bool emptyLine = true;
@@ -141,7 +143,7 @@ bool PkgDB::load() const
             } else if ( nameRead ) {
                 line[strlen(line)-1] = '\0';
                 m_packages[ name ] = line;
-                nameRead = false;                 
+                nameRead = false;
                 if (aliases.find(name) != aliases.end()) {
                     m_aliases[name] = aliases[name];
                 }
@@ -154,7 +156,7 @@ bool PkgDB::load() const
     } else {
         return false;
     }
-    
+
     m_isLoaded = true;
 
     fclose( fp );
@@ -198,17 +200,28 @@ string PkgDB::getPackageVersion( const string& name ) const
   \return a list of matching packages
 */
 void PkgDB::getMatchingPackages( const string& pattern,
-                                 map<string,string>& target ) const
+                                 map<string,string>& target,
+                                 bool useRegex ) const
 {
     if ( !load() ) {
         return;
     }
+
+    RegEx re(pattern);
     map<string, string>::const_iterator it = m_packages.begin();
-    for ( ; it != m_packages.end(); ++it ) {
-        // I assume fnmatch will be quite fast for "match all" (*), so
-        // I didn't add a boolean to check for this explicitely
-        if ( fnmatch( pattern.c_str(), it->first.c_str(), 0  ) == 0 ) {
-            target[it->first] = it->second;
+    if (useRegex) {
+        for ( ; it != m_packages.end(); ++it ) {
+            if (re.match(it->first)) {
+                target[it->first] = it->second;
+            }
+        }
+    } else {
+        for ( ; it != m_packages.end(); ++it ) {
+            // I assume fnmatch will be quite fast for "match all" (*), so
+            // I didn't add a boolean to check for this explicitely
+            if ( fnmatch( pattern.c_str(), it->first.c_str(), 0  ) == 0 ) {
+                target[it->first] = it->second;
+            }
         }
     }
 }

@@ -42,6 +42,7 @@ public:
 
     bool runScripts() const;
     bool preferHigher() const;
+    bool useRegex() const;
 
     void addConfig(const std::string& line,
                    bool configSet,
@@ -70,6 +71,7 @@ private:
 
     bool m_runScripts;
     bool m_preferHigher;
+    bool m_useRegex;
 
     std::string m_makeCommand;
     std::string m_addCommand;

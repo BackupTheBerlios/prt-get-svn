@@ -28,19 +28,20 @@ class PkgDB
 {
 public:
     PkgDB( const std::string& installRoot = "" );
-    bool isInstalled( const std::string& name, 
+    bool isInstalled( const std::string& name,
                       bool useAlias = false,
                       bool* isAlias = 0,
                       string* aliasOrignalName = 0 ) const;
-    
-    
+
+
     std::string getPackageVersion( const std::string& name ) const;
     const std::map<std::string, std::string>& installedPackages();
     void getMatchingPackages( const std::string& pattern,
-                              map<std::string,std::string>& target ) const;
+                              map<std::string,std::string>& target,
+                              bool useRegex ) const;
 private:
     bool load() const;
-    
+
     bool aliasExistsFor(const string& name, string& provider) const;
 
     mutable bool m_isLoaded;

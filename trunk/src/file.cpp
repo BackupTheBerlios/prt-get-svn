@@ -19,6 +19,7 @@
 using namespace std;
 
 #include "stringhelper.h"
+#include "pg_regex.h"
 
 namespace File
 {
@@ -32,7 +33,9 @@ bool fileExists( const string& fileName )
 
 bool grep( const string& fileName,
            const string& pattern,
-           list<string>& result )
+           list<string>& result,
+           bool fullPath,
+           bool useRegex)
 {
     FILE* fp;
     fp = fopen( fileName.c_str(), "r" );
@@ -45,21 +48,39 @@ bool grep( const string& fileName,
     char* end;
     string line;
     string entry;
+    
+    RegEx re(pattern);
 
     while ( fgets( input, length, fp ) ) {
         p = strtok( input, "\t" );
         p = strtok( NULL, "\t" );
         p = strtok( NULL, "\t" );
-        
+
         if ( p ) {
+            // prepend slash to string
+            p--;
+            p[0] = '/';
+            
             entry = p;
             end = strstr(p, "->");
             if (end) {
                 *end = '\0';
             }
             p[strlen(p)-1] = '\0'; // strip newline
-            if ( fnmatch(pattern.c_str(), basename( p ), FNM_CASEFOLD) == 0 ) {
-                result.push_back( StringHelper::stripWhiteSpace(entry) );
+            
+            char* name = p;
+            if (!fullPath) {
+                name = basename(p);
+            }
+                
+            if (useRegex) {
+                if (re.match(name)) {
+                    result.push_back(StringHelper::stripWhiteSpace(entry));
+                }
+            } else {
+                if ( fnmatch(pattern.c_str(), name, FNM_CASEFOLD) == 0 ) {
+                    result.push_back( StringHelper::stripWhiteSpace(entry) );
+                }
             }
         }
     }

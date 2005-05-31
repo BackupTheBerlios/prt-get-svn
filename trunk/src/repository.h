@@ -29,7 +29,7 @@ using namespace std;
 class Repository
 {
 public:
-    Repository();
+    Repository(bool useRegex);
     ~Repository();
 
     const Package* getPackage( const string& name ) const;
@@ -63,11 +63,12 @@ public:
     };
     WriteResult writeCache( const string& cacheFile );
 
-    static bool createOutputDir( const string& path );    
+    static bool createOutputDir( const string& path );
     void addDependencies( std::map<string, string>& deps );
-    
+
 private:
     static string CACHE_VERSION;
+    bool m_useRegex;
 
     map<string, pair<string, string> > m_shadowedPackages;
     map<string, Package*> m_packageMap;

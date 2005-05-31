@@ -1,5 +1,11 @@
 * 0.5.11	29.05.2005  Johannes Winkelmann
 - add --path to 'ls'
+- initial regex support
+- replace `uname -r` and `date +...` in version strings
+- add 'useregex' config key and --regex command line argument
+- Add --full to fsearch
+- use regex in fsearch if requested
+- add leading slash to fsearch result
 
 * 0.5.10	21.04.2005  Johannes Winkelmann
 - fix bugs #3735, #3836

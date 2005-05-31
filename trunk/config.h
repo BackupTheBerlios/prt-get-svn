@@ -19,6 +19,9 @@
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 /* #undef HAVE_NDIR_H */
 
+/* Define to 1 if you have the <regex.h> header file. */
+#define HAVE_REGEX_H 1
+
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1
 
@@ -79,7 +82,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "0.5.10"
+#define VERSION "0.5.11-pre1"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

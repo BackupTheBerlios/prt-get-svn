@@ -1,0 +1,21 @@
+0.5.11
+------
+- refactor regex stuff
+  - fix config/argparser stuff [done]
+  - fix todo's [done]
+- enable aliases in port
+- release reference card
+- add --full to 'fsearch'; make it use regex too [done]
+
+
+0.5.x
+-----
+- update dumpconfig
+
+
+0.6.x
+-----
+- add new argument parser
+- add parallel build/download feature
+- make --full in fsearch default
+- make regex in default

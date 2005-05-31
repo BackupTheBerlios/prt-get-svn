@@ -154,13 +154,13 @@ to see only diffs which have a lower version installed than the one in
 the ports tree, use the --prefer-higher option.
 
 .TP 
-.B search [\-v|\-vv] [--path]<expr>
+.B search [\-v|\-vv] [--path] [--regex]<expr>
 Search the ports tree for
 .B expr
 in their name
 
 .TP 
-.B dsearch [\-v|\-vv] [--path]<expr>
+.B dsearch [\-v|\-vv] [--path]  [--regex]<expr>
 Search the ports tree for
 .B expr
 in both name and description. The search in the description is not case
@@ -170,12 +170,14 @@ functionality, so you only have to spend this time once after updating
 the ports tree has been updated.
 
 .TP 
-.B fsearch <pattern>
+.B fsearch [--full] [--regex] <pattern>
 Search the ports tree for
 .B pattern
-as file name in their footprint. Strips the directories from the file
-names before matching. Pattern can be a shell-like wildcard pattern (e.g
-prt-get fsearch "*.h").
+as file name in their footprint. When called without '--full', strips
+the directories from the file names before matching; this behaviour
+will change in prt-get 0.6, where full path search will be
+default. Pattern can be a shell-like wildcard pattern (e.g prt-get
+fsearch "*.h") or regexps.
 
 
 .TP 
@@ -225,7 +227,7 @@ List ports which can be found in multiple directories configured in
 
 
 .TP 
-.B list [\-v|\-vv] [filter] [--path]
+.B list [\-v|\-vv] [filter] [--path] [--regex]
 List ports available in the ports tree. It's basically the same as
 .B ports \-l
 but looks in all directories specified in
@@ -305,7 +307,7 @@ to filter by package name.
 
 
 .TP 
-.B listinst [\-v|\-vv] [filter]
+.B listinst [\-v|\-vv] [filter] [--regex]
 List installed ports. It's basically the same as
 .B pkginfo \-i,
 but omits version when called without verbose (\-v, \-vv) switch. Plus
@@ -332,7 +334,7 @@ Prints out the version of the currently installed package
 
 
 .TP
-.B ls <package>
+.B ls [--path] <package>
 Prints out a listing of the port's directory
 
 .TP
@@ -449,6 +451,9 @@ description (if available)
 
 .B \-\-path
 Show path info; used in 'search', 'dsearch', 'list' and 'depends'
+
+.B \-\-regex
+Interpret filter and search pattern as regular expression
 
 .TP 
 .B \-\-margs="...", e.g. \-\-margs="\-im"

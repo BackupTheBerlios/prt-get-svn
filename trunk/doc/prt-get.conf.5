@@ -48,6 +48,9 @@ runscripts yes
 
 # don't prefer higher versions (default no)
 preferhigher yes
+
+# use regexps for searching (default no)
+useregex yes
 .fi
 
 .LP
@@ -87,6 +90,11 @@ if set to yes, execute pre- and post-install scripts
 if set to yes, prt-get will parse version strings and prefer the
 higher one, even if the one found in the ports tree is lower. Will
 influence diff, quickdiff and sysup
+
+.B useregex
+if set to yes, prt-get will interpret search and filter patterns in
+list, listinst, printf, search, dsearch and fsearch as regular
+expressions. This will be the default in prt-get 0.6.
 
 .LP
 .B makecommand

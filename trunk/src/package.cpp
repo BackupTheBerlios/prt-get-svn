@@ -299,34 +299,35 @@ void Package::expandShellCommands(std::string& input,
     string endTag[TAG_COUNT] = { "`", ")" };
     
     for (int i = 0; i < TAG_COUNT; ++i) {
-        string::size_type pos = input.find(startTag[i]);
-        if (pos == string::npos) {
-            continue;
-        }
+        string::size_type pos;
+        while ((pos = input.find(startTag[i])) != string::npos) {
 
-        if (unameBuf.release) {
-            input = replaceAll(input, startTag[i] + "uname -r" + endTag[i], 
-                               unameBuf.release);
-        }
-
-        pos = input.find(startTag[i] + "date");
-        if (pos != string::npos) {
-            // NOTE: currently only works for one date pattern
-            string::size_type startpos, endpos;
-            endpos = input.find(endTag[i], pos+1);
-            startpos = input.find('+', pos+1);
-        
-            string format = input.substr(startpos+1, endpos-startpos-1);
-        
-            // support date '+...' and date "+..."
-            int len = format.length();
-            if (format[len-1] == '\'' || format[len-1] == '"') {
-                format = format.substr(0, len-1);
+            if (unameBuf.release) {
+                input = replaceAll(input, 
+                                   startTag[i] + "uname -r" + endTag[i], 
+                                   unameBuf.release);
             }
-            char timeBuf[32];
-            strftime(timeBuf, 32, format.c_str(), localtime(&timeNow));
 
-            input = input.substr(0, pos) + timeBuf + input.substr(endpos+1);
+            pos = input.find(startTag[i] + "date");
+            if (pos != string::npos) {
+                // NOTE: currently only works for one date pattern
+                string::size_type startpos, endpos;
+                endpos = input.find(endTag[i], pos+1);
+                startpos = input.find('+', pos+1);
+        
+                string format = input.substr(startpos+1, endpos-startpos-1);
+        
+                // support date '+...' and date "+..."
+                int len = format.length();
+                if (format[len-1] == '\'' || format[len-1] == '"') {
+                    format = format.substr(0, len-1);
+                }
+                char timeBuf[32];
+                strftime(timeBuf, 32, format.c_str(), localtime(&timeNow));
+
+                input = input.substr(0, pos) + timeBuf + 
+                    input.substr(endpos+1);
+            }
         }
     }
 }

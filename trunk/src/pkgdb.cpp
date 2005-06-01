@@ -26,7 +26,7 @@ using namespace std;
 
 
 const string PkgDB::PKGDB = "/var/lib/pkg/db";
-const string PkgDB::ALIAS_STORE = "/var/lib/pkg/aliases";
+const string PkgDB::ALIAS_STORE = "/var/lib/pkg/prt-get.aliases";
 
 /*!
   Create a PkgDB object

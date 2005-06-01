@@ -67,7 +67,8 @@ public:
     void addDependencies( std::map<string, string>& deps );
 
 private:
-    static string CACHE_VERSION;
+    static const std::string CACHE_VERSION;
+    static const std::string EXTERNAL_DEPENDENCY_FILE;
     bool m_useRegex;
 
     map<string, pair<string, string> > m_shadowedPackages;

@@ -64,7 +64,7 @@ PrtGet::PrtGet( const ArgParser* parser )
 
     m_pkgDB = new PkgDB(m_parser->installRoot());
     readConfig();
-    
+
     m_useRegex = m_config->useRegex() || m_parser->useRegex();
 }
 
@@ -454,14 +454,6 @@ void PrtGet::initRepo( bool listDuplicate )
 
         } else {
             m_repo->initFromFS( m_config->rootList(), listDuplicate );
-        }
-    }
-
-    std::string depFile = m_config->depFile();
-    if (depFile != "") {
-        map<string, string> depMap;
-        if (DataFileParser::parse(depFile, depMap)) {
-            m_repo->addDependencies(depMap);
         }
     }
 }
@@ -1436,8 +1428,8 @@ void PrtGet::fsearch()
         string fp =
             it->second->path() + "/" +
             it->second->name() + "/" + ".footprint";
-        if ( File::grep( fp, arg, matches, 
-                         m_parser->fullPath(), 
+        if ( File::grep( fp, arg, matches,
+                         m_parser->fullPath(),
                          m_useRegex)) {
             if ( matches.size() > 0 ) {
                 if ( first ) {
@@ -1839,12 +1831,6 @@ void PrtGet::dumpConfig()
         cout << "Configuration file: " << fName << endl;
     }
 
-    if (m_config->depFile() != "") {
-        cout.setf( ios::left, ios::adjustfield );
-        cout.width( 20 );
-        cout.fill( ' ' );
-        cout << "Dependency file: " << m_config->depFile() << endl;
-    }
     if (m_config->cacheFile() != "") {
         cout.setf( ios::left, ios::adjustfield );
         cout.width( 20 );

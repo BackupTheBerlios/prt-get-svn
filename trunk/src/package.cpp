@@ -163,10 +163,15 @@ void Package::load() const
     char input[length];
     string line;
     
-    struct utsname unameBuf;
     time_t timeNow;
     time(&timeNow);
-    bool unameAvailable = uname(&unameBuf) == 0;
+    
+    struct utsname unameBuf;
+    if (uname(&unameBuf) != 0) {
+        unameBuf.release[0] = '\0';
+    }
+
+
 
     while ( fgets( input, length, fp ) ) {
 
@@ -175,31 +180,8 @@ void Package::load() const
         if ( line.substr( 0, 8 ) == "version=" ) {
             m_data->version = getValueBefore( getValue( line, '=' ), '#' );
             m_data->version = stripWhiteSpace( m_data->version );
-            
-            if (unameAvailable) {
-                m_data->version = replaceAll(m_data->version, 
-                                             "`uname -r`", 
-                                             unameBuf.release);
-            }
-            
-            string::size_type pos = m_data->version.find("`date");
-            if (pos != string::npos) {
-                
-                // TODO: currently only works for one date pattern
-                string::size_type startpos, endpos;
-                endpos = m_data->version.find('`', pos+1);
-                startpos = m_data->version.find('+', pos+1);
-                char timeBuf[32];
-                strftime(timeBuf, 32, 
-                         m_data->version.substr(startpos+1, 
-                                                endpos-startpos-1).c_str(), 
-                         localtime(&timeNow));
-                
-                m_data->version = m_data->version.substr(0, pos) + 
-                    timeBuf + 
-                    m_data->version.substr(endpos+1);
-            }
-                                         
+
+            expandShellCommands(m_data->version, timeNow, unameBuf);
         } else if ( line.substr( 0, 8 ) == "release=" ) {
             m_data->release = getValueBefore( getValue( line, '=' ), '#' );
             m_data->release = stripWhiteSpace( m_data->release );
@@ -303,4 +285,48 @@ PackageData::PackageData( const string& name_,
     hasReadme = ( stripWhiteSpace( hasReadme_ ) == "yes" );
     hasPreInstall = ( stripWhiteSpace( hasPreInstall_ ) == "yes" );
     hasPostInstall = ( stripWhiteSpace( hasPostInstall_ ) == "yes" );
+}
+
+
+void Package::expandShellCommands(std::string& input, 
+                                  const time_t& timeNow,
+                                  const struct utsname unameBuf)
+{
+    // TODO: consider dropping either of the tagsets, depending on feedback
+    
+    static const int TAG_COUNT = 2;
+    string startTag[TAG_COUNT] = { "`", "$(" };
+    string endTag[TAG_COUNT] = { "`", ")" };
+    
+    for (int i = 0; i < TAG_COUNT; ++i) {
+        string::size_type pos = input.find(startTag[i]);
+        if (pos != string::npos) {
+            continue;
+        }
+
+        if (unameBuf.release) {
+            input = replaceAll(input, startTag[i] + "uname -r" + endTag[i], 
+                               unameBuf.release);
+        }
+
+        pos = input.find(startTag[i] + "date");
+        if (pos != string::npos) {
+            // NOTE: currently only works for one date pattern
+            string::size_type startpos, endpos;
+            endpos = input.find(endTag[i], pos+1);
+            startpos = input.find('+', pos+1);
+        
+            string format = input.substr(startpos+1, endpos-startpos-1);
+        
+            // support date '+...' and date "+..."
+            int len = format.length();
+            if (format[len-1] == '\'' || format[len-1] == '"') {
+                format = format.substr(0, len-1);
+            }
+            char timeBuf[32];
+            strftime(timeBuf, 32, format.c_str(), localtime(&timeNow));
+
+            input = input.substr(0, pos) + timeBuf + input.substr(endpos+1);
+        }
+    }
 }

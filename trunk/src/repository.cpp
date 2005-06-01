@@ -23,13 +23,16 @@ using namespace std;
 #include <unistd.h>
 #include <fnmatch.h>
 
+#include "datafileparser.h"
 #include "repository.h"
 #include "stringhelper.h"
 #include "pg_regex.h"
 using namespace StringHelper;
 
 
-string Repository::CACHE_VERSION = "V5";
+const string Repository::CACHE_VERSION = "V5";
+const string Repository::EXTERNAL_DEPENDENCY_FILE = 
+    "/var/lib/pkg/prt-get.deplist";
 
 /*!
   Create a repository
@@ -37,6 +40,10 @@ string Repository::CACHE_VERSION = "V5";
 Repository::Repository(bool useRegex)
     : m_useRegex(useRegex)
 {
+    map<string, string> depMap;
+    if (DataFileParser::parse(EXTERNAL_DEPENDENCY_FILE, depMap)) {
+        addDependencies(depMap);
+    }
 }
 
 /*!
@@ -123,8 +130,8 @@ void Repository::searchMatchingPackages( const string& pattern,
                 if ( s.find( toLowerCase( pattern ) ) != string::npos ) {
                     target.push_back( it->second );
                 }
-            }   
-        }    
+            }
+        }
     }
 }
 

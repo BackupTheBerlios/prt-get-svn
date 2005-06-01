@@ -27,7 +27,6 @@ Configuration::Configuration( const std::string& configFile,
       m_writeLog( false ),
       m_appendLog( false ),
       m_logFilePattern( "" ),
-      m_depFile( "" ),
       m_cacheFile( "" ),
       m_readmeMode( VERBOSE_README ),
       m_runScripts( false ),
@@ -93,12 +92,6 @@ Configuration::ReadmeMode Configuration::readmeMode() const
     return m_readmeMode;
 }
 
-std::string Configuration::depFile() const
-{
-    return m_depFile;
-}
-
-
 std::string Configuration::cacheFile() const
 {
     return m_cacheFile;
@@ -156,9 +149,6 @@ void Configuration::parseLine(const string& line, bool prepend)
     } else if ( startwith_nocase( s, "logfile" ) ) {
         s = stripWhiteSpace( s.replace( 0, 7, "" ) );
         m_logFilePattern = s;
-    } else if ( startwith_nocase( s, "depfile" ) ) {
-        s = stripWhiteSpace( s.replace( 0, 7, "" ) );
-        m_depFile = s;
     } else if ( startwith_nocase( s, "logmode" ) ) {
         s = stripWhiteSpace( s.replace( 0, 7, "" ) );
         if ( s == "append" ) {

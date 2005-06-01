@@ -25,3 +25,5 @@ EXTRA_DIST = prt-get.conf
 
 install-data-local: install-binPROGRAMS
 	(cd $(DESTDIR)$(bindir); ln -sf prt-get prt-cache)
+	$(INSTALL) -D -m 644 prt-get.conf $(DESTDIR)/etc/prt-get.conf
+

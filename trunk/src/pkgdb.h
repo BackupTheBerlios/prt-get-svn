@@ -39,6 +39,9 @@ public:
     void getMatchingPackages( const std::string& pattern,
                               map<std::string,std::string>& target,
                               bool useRegex ) const;
+    
+    static const std::string ALIAS_STORE;
+
 private:
     bool load() const;
 
@@ -51,7 +54,6 @@ private:
     std::string m_installRoot;
 
     static const std::string PKGDB;
-    static const std::string ALIAS_STORE;
 };
 
 #endif /* _PKGDB_H_ */

@@ -40,8 +40,8 @@ using namespace std;
 using namespace StringHelper;
 
 
-const string PrtGet::CONF_FILE = "/etc/prt-get.conf";
-const string PrtGet::DEFAULT_CACHE_FILE = "/var/lib/pkg/prt-get.cache";
+const string PrtGet::CONF_FILE = SYSCONFDIR"/prt-get.conf";
+const string PrtGet::DEFAULT_CACHE_FILE = LOCALSTATEDIR"/lib/pkg/prt-get.cache";
 
 /*!
   Create a PrtGet object
@@ -1820,6 +1820,19 @@ void PrtGet::printDepsLevel(int indent, const Package* package)
 
 void PrtGet::dumpConfig()
 {
+    
+    cout.setf( ios::left, ios::adjustfield );
+    cout.width( 20 );
+    cout.fill( ' ' );
+    cout << "Alias file: " << PkgDB::ALIAS_STORE << endl;
+
+    cout.setf( ios::left, ios::adjustfield );
+    cout.width( 20 );
+    cout.fill( ' ' );
+    cout << "Ext. dep. file: " 
+         << Repository::EXTERNAL_DEPENDENCY_FILE << endl;
+    
+    
     if (!m_parser->noStdConfig()) {
         string fName = CONF_FILE;
         if ( m_parser->isAlternateConfigGiven() ) {

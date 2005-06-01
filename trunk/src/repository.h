@@ -66,10 +66,13 @@ public:
     static bool createOutputDir( const string& path );
     void addDependencies( std::map<string, string>& deps );
 
+    static const std::string EXTERNAL_DEPENDENCY_FILE;
+
 private:
     static const std::string CACHE_VERSION;
-    static const std::string EXTERNAL_DEPENDENCY_FILE;
     bool m_useRegex;
+    
+    void parseDependencyList();
 
     map<string, pair<string, string> > m_shadowedPackages;
     map<string, Package*> m_packageMap;

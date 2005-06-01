@@ -32,7 +32,7 @@ using namespace StringHelper;
 
 const string Repository::CACHE_VERSION = "V5";
 const string Repository::EXTERNAL_DEPENDENCY_FILE = 
-    "/var/lib/pkg/prt-get.deplist";
+    LOCALSTATEDIR"/lib/pkg/prt-get.deplist";
 
 /*!
   Create a repository
@@ -40,10 +40,6 @@ const string Repository::EXTERNAL_DEPENDENCY_FILE =
 Repository::Repository(bool useRegex)
     : m_useRegex(useRegex)
 {
-    map<string, string> depMap;
-    if (DataFileParser::parse(EXTERNAL_DEPENDENCY_FILE, depMap)) {
-        addDependencies(depMap);
-    }
 }
 
 /*!
@@ -76,6 +72,15 @@ const map<string, Package*>& Repository::packages() const
 const map<string, pair<string, string> >& Repository::shadowedPackages() const
 {
     return m_shadowedPackages;
+}
+
+
+void Repository::parseDependencyList()
+{
+    map<string, string> depMap;
+    if (DataFileParser::parse(EXTERNAL_DEPENDENCY_FILE, depMap)) {
+        addDependencies(depMap);
+    }
 }
 
 
@@ -233,6 +238,8 @@ void Repository::initFromFS( const list< pair<string, string> >& rootList,
         }
         closedir( d );
     }
+    
+    parseDependencyList();
 }
 
 /*!
@@ -287,6 +294,8 @@ Repository::initFromCache( const string& cacheFile )
     }
     fclose( fp );
 
+    parseDependencyList();
+    
     return READ_OK;
 }
 

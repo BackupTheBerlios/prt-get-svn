@@ -26,3 +26,5 @@ prt_get_SOURCES= argparser.cpp argparser.h\
 		 pg_regex.cpp pg_regex.h
 
 
+AM_CPPFLAGS = -DSYSCONFDIR=\"$(sysconfdir)\" \
+	      -DLOCALSTATEDIR=\"$(localstatedir)\"

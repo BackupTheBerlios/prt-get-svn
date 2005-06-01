@@ -10,7 +10,11 @@
 
 0.5.x
 -----
+- proper (permanent) ignore
+- sysup injecting deps
 - update dumpconfig
+- merge list, search and printf to one function
+  - add --format="printf format" option
 
 
 0.6.x

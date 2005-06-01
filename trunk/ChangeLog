@@ -6,6 +6,9 @@
 - Add --full to fsearch
 - use regex in fsearch if requested
 - add leading slash to fsearch result
+- support both `` and $()
+- support date patterns like '+%Y'
+- add aliases and deplist to dist-tarball
 
 * 0.5.10	21.04.2005  Johannes Winkelmann
 - fix bugs #3735, #3836

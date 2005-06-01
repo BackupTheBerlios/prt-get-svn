@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT
 AC_CONFIG_SRCDIR([src/prtget.cpp])
-AM_INIT_AUTOMAKE(prt-get,0.5.11-pre3)
+AM_INIT_AUTOMAKE(prt-get,0.5.11-pre4)
 
 
 dnl Determine default prefix
@@ -28,6 +28,10 @@ LDFLAGS="$LDFLAGS $LIBS $X_PRE_LIBS"
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
+
+# I hate you autotools
+sysconfdir="/etc"
+localstatedir="/var"
 
 # Checks for library functions.
 AM_CONFIG_HEADER(config.h)

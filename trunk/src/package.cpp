@@ -300,7 +300,7 @@ void Package::expandShellCommands(std::string& input,
     
     for (int i = 0; i < TAG_COUNT; ++i) {
         string::size_type pos = input.find(startTag[i]);
-        if (pos != string::npos) {
+        if (pos == string::npos) {
             continue;
         }
 

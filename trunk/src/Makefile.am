@@ -3,7 +3,6 @@
 install-exec-local: install-binPROGRAMS
 	(cd $(DESTDIR)$(bindir); ln -sf prt-get prt-cache)
 
-
 bin_PROGRAMS=prt-get
 
 prt_get_SOURCES= argparser.cpp argparser.h\

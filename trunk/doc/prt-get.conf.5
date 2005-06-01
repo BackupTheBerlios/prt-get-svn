@@ -40,9 +40,6 @@ logfile /tmp/log/%n.log
 # show compact readme information
 readme compact
 
-# use external dependency file
-depfile /var/lib/pkg/opt.dependencies
-
 # execute pre- and post-installs scripts (default no)
 runscripts yes
 
@@ -75,9 +72,6 @@ The value for
 is a directory, the value for
 .B cachefile
 is a file to be used as cache
-.B depfile
-is a file which allows to specify dependencies for ports; the format of this
-file is
 
 .nf
 <portname1>:<dependency1> <dependency2>

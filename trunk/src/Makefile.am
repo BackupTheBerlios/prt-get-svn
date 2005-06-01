@@ -1,5 +1,9 @@
 # Makefile.am for prt-get by Johannes Winkelmann
 
+install-exec-local: install-binPROGRAMS
+	(cd $(DESTDIR)$(bindir); ln -sf prt-get prt-cache)
+
+
 bin_PROGRAMS=prt-get
 
 prt_get_SOURCES= argparser.cpp argparser.h\
@@ -21,9 +25,4 @@ prt_get_SOURCES= argparser.cpp argparser.h\
 		 datafileparser.cpp datafileparser.h \
 		 pg_regex.cpp pg_regex.h
 
-EXTRA_DIST = prt-get.conf
-
-install-data-local: install-binPROGRAMS
-	(cd $(DESTDIR)$(bindir); ln -sf prt-get prt-cache)
-	$(INSTALL) -D -m 644 prt-get.conf $(DESTDIR)/etc/prt-get.conf
 

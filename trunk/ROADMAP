@@ -1,12 +1,8 @@
 0.5.11
 ------
-- refactor regex stuff
-  - fix config/argparser stuff [done]
-  - fix todo's [done]
-- enable aliases in port
-- release reference card
-- add --full to 'fsearch'; make it use regex too [done]
-
+- speed: make shell expansion optional?
+- make aliases optional?
+- make depfile optional?
 
 0.5.x
 -----

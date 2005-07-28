@@ -11,7 +11,7 @@ prt-get.conf - Configuration file for prt-get
 .SH "DESCRIPTION"
 This file, by default
 .IR /etc/prt-get.conf ,
-is read by prt-get and prt-cache (see prt-get(8) and prt-cache(8))
+is read by prt-get and prt-cache(8))
 .LP
 It might look like this:
 .IP
@@ -29,8 +29,8 @@ prtdir /usr/ports/unofficial
 # use mutt and yafc from local build directory
 prtdir /home/jw/build:mutt, yafc
 
-# change default location of cache file
-cachefile /tmp/port-cache
+# location of cache file
+cachefile /var/lib/pkg/prt-get.cache
 
 # write a log file
 writelog enabled
